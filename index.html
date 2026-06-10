@@ -1,0 +1,3391 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>오구 직업센터 v13.2.10 - 새 학년 초기화 보강</title>
+  <style>
+    :root{
+      --bg:#f3f6fb; --card:#ffffff; --text:#1f2937; --muted:#6b7280; --line:#e5e7eb;
+      --primary:#2563eb; --primary-dark:#1d4ed8; --danger:#dc2626; --radius:16px;
+      --shadow:0 12px 30px rgba(15,23,42,.08);
+    }
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:"Malgun Gothic","Apple SD Gothic Neo",Arial,sans-serif;background:linear-gradient(135deg,#eef4ff,#f9fafb);color:var(--text);min-height:100vh;}
+    button,input,select,textarea{font-family:inherit;font-size:15px;}
+    button{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;background:var(--primary);color:white;font-weight:700;}
+    button:hover{background:var(--primary-dark);}
+    button.secondary{background:#eef2ff;color:#1e40af;}
+    button.secondary:hover{background:#dbeafe;}
+    button.danger{background:#fee2e2;color:#991b1b;}
+    button.danger:hover{background:#fecaca;}
+    button.gray{background:#f3f4f6;color:#374151;}
+    button.gray:hover{background:#e5e7eb;}
+    input,select,textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:white;outline:none;}
+    textarea{min-height:110px;resize:vertical;}
+    label{display:block;font-weight:700;margin:12px 0 6px;color:#374151;}
+    .hidden{display:none !important;}
+    .wrap{max-width:1220px;margin:0 auto;padding:22px;}
+    .login-shell{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:22px;}
+    .login-card{width:100%;max-width:920px;display:grid;grid-template-columns:1.05fr .95fr;gap:18px;}
+    .hero,.login-box,.card{background:rgba(255,255,255,.94);border:1px solid rgba(226,232,240,.9);box-shadow:var(--shadow);border-radius:var(--radius);padding:26px;}
+    .hero h1{margin:0 0 10px;font-size:34px;letter-spacing:-1px;}
+    .hero p{margin:8px 0;color:var(--muted);line-height:1.65;}
+    .badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px;}
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:8px 11px;border-radius:999px;background:#f1f5f9;font-size:13px;font-weight:700;color:#475569;}
+    .login-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;padding:5px;background:#f1f5f9;border-radius:14px;}
+    .login-tabs button{background:transparent;color:#64748b;}
+    .login-tabs button.active{background:white;color:#1d4ed8;box-shadow:0 5px 12px rgba(37,99,235,.12);}
+    .topbar{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);}
+    .topbar-inner{max-width:1220px;margin:0 auto;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+    .brand{display:flex;flex-direction:column;gap:2px;}
+    .brand strong{font-size:20px;}
+    .brand span{font-size:13px;color:var(--muted);}
+    .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0;}
+    .tabs button{background:#e5edff;color:#1e40af;}
+    .tabs button.active{background:var(--primary);color:white;}
+    .grid{display:grid;gap:16px;}
+    .grid.cols-2{grid-template-columns:1fr 1fr;}
+    .grid.cols-3{grid-template-columns:repeat(3,1fr);}
+    .grid.cols-4{grid-template-columns:repeat(4,1fr);}
+    .stat{background:white;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 8px 18px rgba(15,23,42,.04);}
+    .stat .num{font-size:30px;font-weight:900;margin-top:6px;}
+    .stat .label{color:var(--muted);font-size:14px;}
+    .card h2,.card h3{margin:0 0 14px;letter-spacing:-.5px;}
+    .muted{color:var(--muted);}
+    .small{font-size:13px;}
+    .row{display:flex;gap:8px;align-items:end;}
+    .row > *{flex:1;}
+    .row .fit{flex:0 0 auto;}
+    table{width:100%;border-collapse:collapse;background:white;border-radius:14px;overflow:hidden;border:1px solid var(--line);}
+    th,td{border-bottom:1px solid var(--line);padding:11px 10px;text-align:left;vertical-align:middle;font-size:14px;}
+    th{background:#f8fafc;color:#475569;font-size:13px;}
+    tr:last-child td{border-bottom:0;}
+    .pill{display:inline-flex;align-items:center;justify-content:center;min-width:34px;padding:5px 9px;border-radius:999px;font-weight:800;font-size:13px;}
+    .pill.a{background:#fee2e2;color:#991b1b;}
+    .pill.b{background:#fef3c7;color:#92400e;}
+    .pill.c{background:#dcfce7;color:#166534;}
+    .pill.ok{background:#dbeafe;color:#1d4ed8;}
+    .pill.warn{background:#ffedd5;color:#9a3412;}
+    .pill.bad{background:#fee2e2;color:#991b1b;}
+    .actions{display:flex;gap:6px;flex-wrap:wrap;}
+    .actions button{padding:7px 9px;font-size:13px;}
+    .student-home{max-width:900px;margin:0 auto;}
+    .job-card{border:1px solid var(--line);border-radius:18px;background:linear-gradient(135deg,#ffffff,#f8fbff);padding:20px;margin-bottom:16px;}
+    .job-card h2{margin:8px 0 6px;font-size:28px;}
+    .notice{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:14px;padding:12px 14px;line-height:1.55;margin:14px 0;}
+    .successbox{background:#ecfdf5;border:1px solid #bbf7d0;color:#166534;border-radius:14px;padding:12px 14px;line-height:1.55;margin:14px 0;}
+    .empty{padding:28px;text-align:center;color:var(--muted);background:#f8fafc;border:1px dashed #cbd5e1;border-radius:16px;}
+    .score-guide{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:8px 0 16px;}
+    .score-guide div{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:8px;text-align:center;font-size:12px;color:#475569;}
+
+
+
+
+
+    .setup-backdrop{
+      position:fixed;
+      inset:0;
+      z-index:300;
+      background:rgba(15,23,42,.72);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+    .setup-card{
+      width:min(560px,100%);
+      background:white;
+      color:#111827;
+      border-radius:24px;
+      box-shadow:0 30px 90px rgba(0,0,0,.35);
+      padding:28px;
+      border:1px solid #e5e7eb;
+    }
+    .setup-card h2{
+      margin:0 0 8px;
+      font-size:28px;
+      letter-spacing:-1px;
+    }
+    .setup-card p{
+      color:#64748b;
+      line-height:1.6;
+      margin:8px 0 16px;
+    }
+    .setup-rule{
+      background:#eff6ff;
+      border:1px solid #bfdbfe;
+      color:#1e3a8a;
+      border-radius:14px;
+      padding:12px;
+      font-weight:700;
+      line-height:1.5;
+      margin:12px 0;
+    }
+
+    .month-select-grid{
+      display:grid;
+      grid-template-columns:repeat(6,1fr);
+      gap:8px;
+      margin:10px 0 14px;
+    }
+    .month-chip{
+      background:#f1f5f9;
+      color:#334155;
+      border:1px solid #e2e8f0;
+      border-radius:14px;
+      padding:11px 8px;
+      font-weight:900;
+    }
+    .month-chip.active{
+      background:#2563eb;
+      color:white;
+      border-color:#2563eb;
+      box-shadow:0 8px 18px rgba(37,99,235,.22);
+    }
+    .month-chip.vacation{
+      background:#f3f4f6;
+      color:#9ca3af;
+    }
+    .month-chip.vacation.active{
+      background:#64748b;
+      color:white;
+    }
+    .month-now-box{
+      background:#eff6ff;
+      border:1px solid #bfdbfe;
+      color:#1e3a8a;
+      border-radius:16px;
+      padding:14px;
+      font-weight:800;
+      line-height:1.6;
+      margin-top:10px;
+    }
+
+    .center{text-align:center;}
+
+
+
+    .month-chip-wrap{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:12px;
+    }
+    .month-chip{
+      border:1px solid #cbd5e1;
+      background:#fff;
+      color:#334155;
+      border-radius:14px;
+      padding:10px 14px;
+      min-width:72px;
+    }
+    .month-chip.active{
+      background:#2563eb;
+      color:white;
+      border-color:#2563eb;
+      box-shadow:0 8px 20px rgba(37,99,235,.2);
+    }
+    .month-chip.test-month{
+      border-color:#f59e0b;
+      background:#fffbeb;
+    }
+    .month-chip.test-month.active{
+      background:#f59e0b;
+      color:white;
+      border-color:#f59e0b;
+    }
+    .month-chip span{
+      font-size:11px;
+      opacity:.85;
+    }
+
+    .dismissal-modal-backdrop{
+      position:fixed;
+      inset:0;
+      z-index:320;
+      background:rgba(15,23,42,.72);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+    .dismissal-modal{
+      width:min(640px,100%);
+      background:white;
+      color:#111827;
+      border-radius:24px;
+      box-shadow:0 30px 90px rgba(0,0,0,.35);
+      padding:28px;
+      border:1px solid #e5e7eb;
+    }
+    .dismissal-modal h2{
+      margin:0 0 8px;
+      font-size:28px;
+      letter-spacing:-1px;
+    }
+    .dismissal-summary{
+      background:#fff1f2;
+      border:1px solid #fecaca;
+      color:#991b1b;
+      border-radius:14px;
+      padding:12px;
+      line-height:1.55;
+      margin:14px 0;
+      font-weight:700;
+    }
+
+    .dismissed-row{
+      background:#fff1f2 !important;
+    }
+    .sub-duty-row{
+      background:#f0fdf4 !important;
+    }
+    .dismiss-box{
+      border:1px solid #fecaca;
+      background:#fff1f2;
+      color:#991b1b;
+      border-radius:14px;
+      padding:12px;
+      line-height:1.5;
+      margin:10px 0;
+      font-weight:700;
+    }
+    .sub-duty-box{
+      border:1px solid #bbf7d0;
+      background:#f0fdf4;
+      color:#166534;
+      border-radius:14px;
+      padding:12px;
+      line-height:1.5;
+      margin:10px 0;
+      font-weight:700;
+    }
+    .pill.d{
+      background:#111827;
+      color:white;
+    }
+
+
+    .self-question-card{
+      border:1px solid #e5e7eb;
+      background:#ffffff;
+      border-radius:16px;
+      padding:14px;
+      margin:10px 0;
+    }
+    .self-question-title{
+      font-size:18px;
+      font-weight:900;
+      margin-bottom:4px;
+      color:#1f2937;
+    }
+    .self-question-text{
+      color:#475569;
+      line-height:1.5;
+      margin-bottom:8px;
+    }
+    .tip-cell{
+      max-width:260px;
+      white-space:normal;
+      line-height:1.45;
+    }
+
+    .payroll-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin:10px 0 14px;
+    }
+    .print-area{
+      background:white;
+      color:#111827;
+      padding:22px;
+      border-radius:18px;
+      border:1px solid #e5e7eb;
+      margin-top:14px;
+    }
+    .payroll-title{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      border-bottom:3px solid #111827;
+      padding-bottom:12px;
+      margin-bottom:14px;
+    }
+    .payroll-title h1{
+      margin:0;
+      font-size:28px;
+      letter-spacing:-1px;
+    }
+    .payroll-meta{
+      text-align:right;
+      font-size:14px;
+      line-height:1.6;
+    }
+    .payroll-table th,.payroll-table td{
+      font-size:13px;
+      padding:8px 7px;
+      border:1px solid #d1d5db;
+    }
+    .payroll-table th{
+      background:#f3f4f6;
+      color:#111827;
+      text-align:center;
+    }
+    .payroll-table td.center{
+      text-align:center;
+    }
+    .payroll-table td.money{
+      text-align:right;
+      font-weight:800;
+    }
+    .signature-cell{
+      height:34px;
+      min-width:80px;
+    }
+    .payslip-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin-top:12px;
+    }
+    .payslip{
+      border:2px solid #111827;
+      border-radius:12px;
+      padding:12px;
+      break-inside:avoid;
+      page-break-inside:avoid;
+      min-height:210px;
+    }
+    .payslip h2{
+      margin:0 0 8px;
+      font-size:20px;
+      text-align:center;
+      border-bottom:1px solid #111827;
+      padding-bottom:6px;
+    }
+    .payslip-row{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      border-bottom:1px dashed #d1d5db;
+      padding:6px 0;
+      font-size:14px;
+    }
+    .payslip-row strong{
+      font-size:17px;
+    }
+    .payslip-sign{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      margin-top:12px;
+      font-size:14px;
+    }
+    .payroll-note{
+      margin-top:12px;
+      padding:10px;
+      border:1px solid #d1d5db;
+      background:#f9fafb;
+      line-height:1.5;
+      font-size:13px;
+    }
+    @media print{
+      body *{visibility:hidden !important;}
+      #printPayrollArea, #printPayrollArea *{visibility:visible !important;}
+      #printPayrollArea{
+        position:absolute;
+        left:0;
+        top:0;
+        width:100%;
+        padding:0;
+        margin:0;
+        border:0;
+        border-radius:0;
+      }
+      .no-print{display:none !important;}
+      .print-area{box-shadow:none;border:0;padding:0;margin:0;}
+      @page{size:A4; margin:12mm;}
+      .payslip-grid{grid-template-columns:1fr 1fr;}
+      .payslip{min-height:185px;}
+    }
+
+    .choice-board-card{background:linear-gradient(135deg,#ffffff,#eff6ff);border:2px solid #bfdbfe;}
+    .choice-start-row{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0;}
+    .stage-backdrop{position:fixed;inset:0;z-index:200;background:#07111f;color:white;display:flex;flex-direction:column;overflow:hidden;}
+    .stage-top{padding:22px 30px;display:flex;justify-content:space-between;align-items:center;gap:20px;background:linear-gradient(135deg,#0f172a,#1e3a8a);border-bottom:1px solid rgba(255,255,255,.12);}
+    .stage-title{font-size:34px;font-weight:900;letter-spacing:-1px;}
+    .stage-sub{color:#bfdbfe;font-size:16px;margin-top:4px;}
+    .stage-close{background:rgba(255,255,255,.12);color:white;border:1px solid rgba(255,255,255,.22);border-radius:14px;padding:11px 16px;}
+    .stage-main{flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;padding:20px;min-height:0;}
+    .stage-panel{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:24px;padding:22px;min-height:0;box-shadow:0 18px 50px rgba(0,0,0,.22);}
+    .current-student-box{background:linear-gradient(135deg,#2563eb,#7c3aed);border-radius:28px;padding:26px;text-align:center;box-shadow:0 22px 70px rgba(37,99,235,.35);margin-bottom:18px;}
+    .current-label{font-size:24px;font-weight:800;color:#dbeafe;}
+    .current-name{font-size:64px;font-weight:1000;letter-spacing:-3px;margin:10px 0;line-height:1.05;}
+    .current-meta{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:12px;}
+    .stage-pill{display:inline-flex;align-items:center;justify-content:center;padding:9px 14px;border-radius:999px;font-weight:900;font-size:16px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.2);}
+    .stage-pill.grade-a{background:#7f1d1d;}.stage-pill.grade-b{background:#78350f;}.stage-pill.grade-c{background:#14532d;}
+    .stage-controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+    .stage-controls button{font-size:17px;padding:13px 14px;border-radius:16px;}
+    .job-choice-grid{display:grid;grid-template-columns:1fr;gap:12px;overflow:auto;max-height:calc(100vh - 180px);padding-right:4px;}
+    .job-choice-btn{text-align:left;background:rgba(255,255,255,.10);color:white;border:1px solid rgba(255,255,255,.16);border-radius:20px;padding:16px;min-height:105px;transition:.12s;}
+    .job-choice-btn:hover{transform:translateY(-2px);background:rgba(255,255,255,.16);}
+    .job-choice-btn.full{opacity:.38;cursor:not-allowed;background:rgba(148,163,184,.12);}
+    .job-choice-name{font-size:23px;font-weight:1000;letter-spacing:-.7px;margin-bottom:8px;}
+    .job-choice-info{display:flex;justify-content:space-between;gap:8px;align-items:center;color:#dbeafe;font-size:15px;font-weight:800;}
+    .capacity-bar{height:10px;border-radius:999px;background:rgba(255,255,255,.18);overflow:hidden;margin-top:12px;}
+    .capacity-fill{height:100%;background:#60a5fa;border-radius:999px;}
+    .selected-list,.upcoming-list{overflow:auto;max-height:calc(100vh - 180px);padding-right:4px;}
+    .selected-row{display:grid;grid-template-columns:54px 1fr 1fr;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.1);font-size:16px;}
+    .selected-row strong{font-size:18px;}
+    .upcoming-item{display:grid;grid-template-columns:58px 1fr auto;gap:10px;align-items:center;padding:12px 10px;border-bottom:1px solid rgba(255,255,255,.1);border-radius:14px;cursor:pointer;}
+    .upcoming-item.active{background:rgba(96,165,250,.25);border:1px solid rgba(147,197,253,.45);}
+    .upcoming-order{font-size:23px;font-weight:1000;color:#bfdbfe;text-align:center;}
+    .upcoming-name{font-size:19px;font-weight:900;}
+    .upcoming-job{color:#cbd5e1;font-size:13px;margin-top:3px;}
+    .stage-empty{height:100%;display:flex;align-items:center;justify-content:center;text-align:center;color:#cbd5e1;font-size:24px;font-weight:900;line-height:1.5;}
+    .stage-footer{padding:12px 24px 18px;background:rgba(0,0,0,.22);border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-between;gap:12px;color:#bfdbfe;font-weight:800;}
+    .choice-danger{background:#dc2626 !important;}
+
+    .vote-start-card{
+      border:2px solid #dbeafe;
+      background:linear-gradient(135deg,#ffffff,#eff6ff);
+    }
+    .vote-title-big{
+      font-size:30px;
+      font-weight:900;
+      letter-spacing:-1px;
+      margin:4px 0 8px;
+    }
+    .vote-progress{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin:12px 0;
+      color:#475569;
+      font-weight:700;
+      font-size:14px;
+    }
+    .progress-track{
+      height:10px;
+      flex:1;
+      background:#e5e7eb;
+      border-radius:999px;
+      overflow:hidden;
+    }
+    .progress-fill{
+      height:100%;
+      background:#2563eb;
+      border-radius:999px;
+      width:0%;
+      transition:.2s;
+    }
+    .modal-backdrop{
+      position:fixed;
+      inset:0;
+      z-index:100;
+      background:rgba(15,23,42,.55);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+    }
+    .vote-modal{
+      width:min(760px,100%);
+      max-height:92vh;
+      overflow:auto;
+      background:white;
+      border-radius:24px;
+      box-shadow:0 30px 80px rgba(15,23,42,.28);
+      border:1px solid #e5e7eb;
+      padding:22px;
+    }
+    .vote-modal-header{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      border-bottom:1px solid #e5e7eb;
+      padding-bottom:14px;
+      margin-bottom:14px;
+    }
+    .vote-modal-header h2{
+      margin:0;
+      font-size:26px;
+      letter-spacing:-.8px;
+    }
+    .vote-job-name{
+      font-size:32px;
+      font-weight:900;
+      letter-spacing:-1px;
+      margin:8px 0 6px;
+    }
+    .vote-desc{
+      background:#f8fafc;
+      border:1px solid #e5e7eb;
+      border-radius:14px;
+      padding:12px;
+      color:#475569;
+      line-height:1.55;
+      margin:10px 0 16px;
+    }
+    .vote-score-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin-top:12px;
+    }
+    .score-box{
+      border:1px solid #e5e7eb;
+      border-radius:16px;
+      padding:14px;
+      background:#ffffff;
+    }
+    .score-box label{
+      margin:0 0 8px;
+      font-size:16px;
+    }
+    .score-hint{
+      font-size:12px;
+      color:#64748b;
+      margin:0 0 8px;
+      line-height:1.4;
+    }
+    .vote-nav{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+      margin-top:18px;
+      border-top:1px solid #e5e7eb;
+      padding-top:16px;
+    }
+    .vote-nav .center{
+      flex:1;
+      text-align:center;
+      color:#64748b;
+      font-weight:700;
+      font-size:14px;
+    }
+    .close-x{
+      background:#f3f4f6;
+      color:#374151;
+      width:38px;
+      height:38px;
+      padding:0;
+      border-radius:50%;
+      flex:0 0 auto;
+    }
+
+    @media (max-width:860px){
+      .login-card,.grid.cols-2,.grid.cols-3,.grid.cols-4{grid-template-columns:1fr;}
+      .topbar-inner{align-items:flex-start;flex-direction:column;}
+      .row{flex-direction:column;align-items:stretch;}
+      th,td{padding:9px 8px;}
+      .score-guide{grid-template-columns:1fr;}
+      .vote-score-grid{grid-template-columns:1fr;}
+      .vote-job-name{font-size:26px;}
+      .vote-title-big{font-size:25px;}
+      .vote-modal{padding:18px;}
+      .stage-main{grid-template-columns:1fr; overflow:auto;}
+      .current-name{font-size:44px;}
+      .stage-title{font-size:25px;}
+      .stage-backdrop{overflow:auto;}
+      .stage-controls{grid-template-columns:1fr;}
+  
+    .setup-backdrop{
+      position:fixed;
+      inset:0;
+      z-index:300;
+      background:rgba(15,23,42,.72);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+    .setup-card{
+      width:min(560px,100%);
+      background:white;
+      color:#111827;
+      border-radius:24px;
+      box-shadow:0 30px 90px rgba(0,0,0,.35);
+      padding:28px;
+      border:1px solid #e5e7eb;
+    }
+    .setup-card h2{
+      margin:0 0 8px;
+      font-size:28px;
+      letter-spacing:-1px;
+    }
+    .setup-card p{
+      color:#64748b;
+      line-height:1.6;
+      margin:8px 0 16px;
+    }
+    .setup-rule{
+      background:#eff6ff;
+      border:1px solid #bfdbfe;
+      color:#1e3a8a;
+      border-radius:14px;
+      padding:12px;
+      font-weight:700;
+      line-height:1.5;
+      margin:12px 0;
+    }
+
+    .month-select-grid{grid-template-columns:repeat(3,1fr);}
+      .job-choice-grid,.upcoming-list,.selected-list{max-height:none;}
+    }
+  
+    .student-ui-hero p{max-width:520px;margin:0 auto 10px;}
+    .student-login-tip{
+      display:inline-block;
+      margin-top:6px;
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.18);
+      color:#e2e8f0;
+      font-size:13px;
+      font-weight:700;
+    }
+    .student-login-box h2{font-size:24px;}
+    .student-home{
+      display:grid;
+      gap:16px;
+    }
+    .student-home-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      background:linear-gradient(135deg,#1d4ed8,#2563eb);
+      color:white;
+      border-radius:24px;
+      padding:24px;
+      box-shadow:0 18px 40px rgba(37,99,235,.18);
+    }
+    .student-home-top h2{
+      margin:4px 0 6px;
+      font-size:32px;
+      line-height:1.1;
+      color:white;
+    }
+    .student-home-top p{
+      margin:0;
+      color:#dbeafe;
+      font-weight:600;
+    }
+    .student-month-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border-radius:999px;
+      background:rgba(255,255,255,.18);
+      padding:8px 14px;
+      font-size:13px;
+      font-weight:800;
+    }
+    .student-edit-btn{
+      white-space:nowrap;
+      background:white !important;
+      color:#1d4ed8 !important;
+      border:none !important;
+    }
+    .student-summary-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+      margin-top:14px;
+    }
+    .student-summary-card{
+      background:#f8fafc;
+      border:1px solid #e2e8f0;
+      border-radius:18px;
+      padding:16px;
+    }
+    .student-summary-card .label{
+      color:#64748b;
+      font-size:13px;
+      font-weight:800;
+      margin-bottom:6px;
+    }
+    .student-summary-card .value{
+      font-size:24px;
+      font-weight:900;
+      color:#0f172a;
+      line-height:1.2;
+    }
+    .student-main-card{
+      background:white;
+      border:1px solid #e5e7eb;
+      border-radius:22px;
+      padding:22px;
+      box-shadow:0 10px 25px rgba(15,23,42,.06);
+    }
+    .student-main-card h3{
+      margin:0 0 8px;
+      font-size:30px;
+      line-height:1.15;
+      letter-spacing:-0.5px;
+    }
+    .student-main-card .student-job-desc{
+      margin:0;
+      color:#475569;
+      line-height:1.65;
+    }
+    .student-card-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+      margin-bottom:14px;
+    }
+    .student-status-pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:13px;
+      font-weight:900;
+      background:#eff6ff;
+      color:#1d4ed8;
+    }
+    .student-task-card{
+      background:white;
+      border:1px solid #e5e7eb;
+      border-radius:22px;
+      padding:20px;
+      box-shadow:0 10px 25px rgba(15,23,42,.05);
+    }
+    .student-task-card h2{
+      margin:0 0 6px;
+      font-size:24px;
+      letter-spacing:-0.4px;
+    }
+    .student-task-card .task-sub{
+      color:#64748b;
+      margin:0 0 14px;
+      line-height:1.55;
+      font-weight:600;
+    }
+    .student-empty-card{
+      background:#f8fafc;
+      border:1px dashed #cbd5e1;
+      border-radius:20px;
+      padding:22px;
+      text-align:center;
+      color:#475569;
+      font-weight:700;
+    }
+    .student-cta{
+      width:100%;
+      font-size:18px;
+      padding:16px 18px !important;
+      border-radius:16px !important;
+    }
+    .student-score-guide{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:8px;
+      margin:12px 0 16px;
+    }
+    .student-score-guide div{
+      background:#eff6ff;
+      border:1px solid #bfdbfe;
+      color:#1e40af;
+      border-radius:14px;
+      padding:10px 8px;
+      text-align:center;
+      font-size:12px;
+      font-weight:800;
+      line-height:1.4;
+    }
+    .student-progress-text{
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      color:#334155;
+      font-weight:800;
+      margin-bottom:8px;
+    }
+    .student-task-meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-bottom:12px;
+    }
+    .student-task-chip{
+      display:inline-flex;
+      align-items:center;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#f1f5f9;
+      color:#334155;
+      font-size:13px;
+      font-weight:800;
+    }
+    .student-locked{
+      background:#fff7ed;
+      border:1px solid #fed7aa;
+      color:#9a3412;
+      border-radius:16px;
+      padding:14px;
+      font-weight:800;
+      line-height:1.55;
+    }
+    .student-success{
+      background:#f0fdf4;
+      border:1px solid #bbf7d0;
+      color:#166534;
+      border-radius:16px;
+      padding:14px;
+      font-weight:800;
+      line-height:1.55;
+      margin-bottom:12px;
+    }
+    .student-tip-input{
+      font-size:16px !important;
+      padding:14px 16px !important;
+      border-radius:14px !important;
+    }
+    .student-modal-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      margin-bottom:10px;
+    }
+    .student-modal-sub{
+      color:#64748b;
+      font-weight:700;
+      margin-top:4px;
+    }
+    .student-question-card{
+      border:1px solid #dbeafe;
+      background:#f8fbff;
+      border-radius:18px;
+      padding:16px;
+      margin:10px 0;
+    }
+    .student-question-card .self-question-title{
+      font-size:18px;
+      margin-bottom:6px;
+    }
+    .student-question-card select{
+      margin-top:10px;
+      font-size:16px;
+      border-radius:14px;
+      padding:12px 14px;
+    }
+    .setup-card{
+      max-width:560px;
+    }
+    .setup-card h2{font-size:30px;}
+    .setup-card p{font-weight:700;}
+    .setup-card input{font-size:16px;padding:14px 16px;border-radius:14px;}
+    .setup-card label{font-weight:900;color:#0f172a;}
+    @media (max-width: 900px){
+      .student-summary-grid{grid-template-columns:1fr;}
+      .student-home-top{flex-direction:column;align-items:flex-start;}
+      .student-edit-btn{width:100%;}
+    }
+
+    .cloud-status{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:96px;
+      padding:9px 12px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:900;
+      border:1px solid #cbd5e1;
+      background:#f8fafc;
+      color:#334155;
+    }
+    .cloud-status.cloud-ok{background:#ecfdf5;border-color:#bbf7d0;color:#166534;}
+    .cloud-status.cloud-saving{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8;}
+    .cloud-status.cloud-error{background:#fff1f2;border-color:#fecaca;color:#991b1b;}
+    .cloud-status.cloud-local{background:#f8fafc;border-color:#cbd5e1;color:#475569;}
+
+</style>
+</head>
+<body>
+  <section id="loginScreen" class="login-shell">
+    <div class="login-card">
+      <div class="hero student-ui-hero">
+        <h1>오구 직업센터</h1>
+        <p>우리 반 직업 활동을 쉽게 확인하고 제출하는 화면입니다.</p>
+        <div class="student-login-tip">학생은 이름을 선택하고 비밀번호를 입력한 뒤 들어가면 됩니다.</div>
+      </div>
+
+      <div class="login-box student-login-box">
+        <div class="login-tabs">
+          <button id="teacherTab" onclick="switchLogin('teacher')">관리자</button>
+          <button id="studentTab" class="active" onclick="switchLogin('student')">학생</button>
+        </div>
+
+        <div id="teacherLoginBox" class="hidden">
+          <h2>관리자 로그인</h2>
+          <p class="muted small">교사 전용 화면입니다. 관리자 비밀번호를 입력해 주세요.</p>
+          <label for="teacherPw">관리자 비밀번호</label>
+          <input id="teacherPw" type="password" placeholder="비밀번호 입력" onkeydown="if(event.key==='Enter') loginTeacher()" />
+          <div style="height:12px"></div>
+          <button onclick="loginTeacher()">관리자 로그인</button>
+          
+        </div>
+
+        <div id="studentLoginBox">
+          <h2>학생 로그인</h2>
+          <p class="muted small">처음 비밀번호는 123456이에요.</p>
+          <label for="studentSelect">이름 선택</label>
+          <select id="studentSelect"></select>
+          <label for="studentPw">비밀번호</label>
+          <input id="studentPw" type="password" placeholder="초기 비밀번호 123456" onkeydown="if(event.key==='Enter') loginStudent()" />
+          <div style="height:12px"></div>
+          <button class="student-cta" onclick="loginStudent()">학생 화면 들어가기</button>
+        </div>
+
+        <div id="loginMsg" class="notice hidden"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="appScreen" class="hidden">
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <strong id="pageTitle">오구 직업센터</strong>
+          <span id="pageSub">우리반 1인 1역 관리 시스템</span>
+        </div>
+        <div class="actions">
+          <span id="cloudStatus" class="cloud-status cloud-local">로컬 저장</span>
+          <button class="gray" onclick="logout()">로그아웃</button>
+        </div>
+      </div>
+    </div>
+
+    <main class="wrap">
+      <section id="adminView">
+        <div class="tabs">
+          <button class="active" onclick="showTab('systemmonth', this)">월 설정</button>
+          <button onclick="showTab('dashboard', this)">현황</button>
+          <button onclick="showTab('students', this)">학생 관리</button>
+          <button onclick="showTab('jobs', this)">직업 관리</button>
+          <button onclick="showTab('gradevote', this)">직업 등급 투표</button>
+          <button onclick="showTab('month', this)">월 운영</button>
+          <button onclick="showTab('payroll', this)">월급 출력</button>
+          <button onclick="showTab('evaluation', this)">월말 평가</button>
+          <button onclick="showTab('settings', this)">급여 설정</button>
+        </div>
+
+
+        <div id="tab-systemmonth" class="tab-page">
+          <div class="card">
+            <h2>월 설정</h2>
+            <p class="muted small">여기서 정한 월이 시스템 전체의 기준 월입니다. 자기평가, 월말 평가, 월급 출력, 다음 달 역할 선택이 모두 이 월을 따라갑니다.</p>
+            <div id="systemMonthPanelMain"></div>
+          </div>
+        </div>
+
+        <div id="tab-dashboard" class="tab-page hidden">
+          <div class="grid cols-3">
+            <div class="stat"><div class="label">등록 학생</div><div id="statStudents" class="num">0</div></div>
+            <div class="stat"><div class="label">등록 직업</div><div id="statJobs" class="num">0</div></div>
+            <div class="stat"><div class="label">직업 배정</div><div id="statAssigned" class="num">0</div></div>
+          </div>
+          <div style="height:16px"></div>
+          <div class="card">
+            <h2>이번 달 직업 현황</h2>
+            <p class="muted small">학생별 직업, 등급, 성과평가, 경고 횟수, 예상 급여를 확인합니다.</p>
+            <div id="assignmentTable"></div>
+          </div>
+        </div>
+
+        <div id="tab-students" class="tab-page hidden">
+          <div class="grid cols-2">
+            <div class="card">
+              <h2>학생 추가</h2>
+              <label for="newStudentName">학생 이름</label><input id="newStudentName" placeholder="예: 김오구" />
+              <label for="newStudentPw">초기 비밀번호</label><input id="newStudentPw" placeholder="예: 27" />
+              <div style="height:12px"></div><button onclick="addStudent()">학생 추가</button>
+            </div>
+            <div class="card">
+              <h2>직업 배정</h2>
+              <label for="assignStudent">학생</label><select id="assignStudent"></select>
+              <label for="assignJob">직업</label><select id="assignJob"></select>
+              <div style="height:12px"></div><button onclick="assignJob()">배정하기</button>
+            </div>
+          </div>
+          <div style="height:16px"></div>
+          <div class="card">
+            <h2>현재 월 실제 직업 배정표</h2>
+            <p class="muted small">이미 아날로그로 정해져 활동 중인 직업을 여기서 수동으로 맞춰 저장합니다. 저장된 배정은 현재 시스템 월의 월 마감 기록과 다음 달 선택 순서 자동화의 기준이 됩니다.</p>
+            <div id="bulkAssignmentTable"></div>
+            <div style="height:12px"></div>
+            <button onclick="saveBulkAssignments()">초기 배정표 저장</button>
+          </div>
+          <div style="height:16px"></div>
+          <div class="card"><h2>학생 명단</h2><div id="studentTable"></div></div>
+        </div>
+
+        <div id="tab-jobs" class="tab-page hidden">
+          <div class="grid cols-2">
+            <div class="card">
+              <h2>직업 추가</h2>
+              <label for="newJobName">직업 이름</label><input id="newJobName" placeholder="예: 금고 담당" />
+              <label for="newJobGrade">직업 등급</label>
+              <select id="newJobGrade">
+                <option value="A">A - 책임이 크거나 어려운 직업</option>
+                <option value="B">B - 보통 난이도 직업</option>
+                <option value="C">C - 비교적 쉬운 직업</option>
+              </select>
+              <label for="newJobCapacity">배정 인원</label><input id="newJobCapacity" type="number" min="1" value="1" />
+              <label for="newJobDesc">직업 설명</label><textarea id="newJobDesc" placeholder="이 직업이 해야 하는 일을 적어 주세요."></textarea>
+              <div style="height:12px"></div><button onclick="addJob()">직업 추가</button>
+            </div>
+            <div class="card">
+              <h2>운영 원칙</h2>
+              <div class="notice">직업 등급은 ‘학생의 등급’이 아니라 ‘직업의 책임과 난이도’입니다.</div>
+              <div class="successbox">기본급 + 고정 성과급 방식입니다. 예: C등급 700오구 + 성과급 상 300오구 = 1000오구</div>
+            </div>
+          </div>
+          <div style="height:16px"></div>
+          <div class="card"><h2>직업 목록</h2><div id="jobTable"></div></div>
+        </div>
+
+        <div id="tab-gradevote" class="tab-page hidden">
+          <div class="grid cols-2">
+            <div class="card">
+              <h2>이번 달 직업 등급 투표</h2>
+              <p class="muted small">학생들이 직업별로 힘듦, 책임감, 꾸준함, 개인부담을 1~5점으로 평가합니다.</p>
+              <label for="voteMonthName">투표 이름</label>
+              <input id="voteMonthName" placeholder="예: 6월 직업 등급 투표" />
+              <div style="height:12px"></div>
+              <div class="actions">
+                <button onclick="createGradeVote()">새 투표 생성</button>
+                <button class="secondary" onclick="closeGradeVote()">투표 마감</button>
+                <button class="danger" onclick="deleteGradeVote()">투표 삭제</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <h2>투표 상태</h2>
+              <div id="gradeVoteStatus"></div>
+              <div class="notice">추천 등급은 평균점 높은 순서대로 A 3개, B 5개, C 2개로 자동 산출됩니다. 최종 등급은 교사가 수정할 수 있습니다.</div>
+            </div>
+          </div>
+
+          <div style="height:16px"></div>
+          <div class="card"><h2>제출 현황</h2><div id="gradeVoteSubmitStatus"></div></div>
+
+          <div style="height:16px"></div>
+          <div class="card">
+            <h2>평균점 및 최종 등급 검토</h2>
+            <div class="actions" style="margin-bottom:12px">
+              <button onclick="calculateGradeVoteResults()">평균점 계산 / 추천등급 생성</button>
+              <button class="secondary" onclick="applyFinalGradesToJobs()">최종 등급을 직업에 반영</button>
+              <button class="secondary" onclick="publishGradeVoteResults()">결과 공개</button>
+            </div>
+            <label for="gradeVoteTeacherMessage">결과 공개 메시지</label>
+            <textarea id="gradeVoteTeacherMessage" placeholder="예: 이번 달 직업 등급은 친구들의 점수 평가와 교사 최종 검토를 거쳐 정했습니다."></textarea>
+            <div id="gradeVoteResultTable"></div>
+          </div>
+        </div>
+
+
+        <div id="tab-month" class="tab-page hidden">
+
+          <div class="grid cols-2"><div class="month-now-box" id="currentMonthBox">현재 운영 월: -</div>
+              <div class="notice">연도는 저장하지 않습니다. 매년 3월~12월 운영을 반복할 수 있도록 월 번호만 저장합니다.</div>
+            </div>
+            <div class="card">
+              <h2>월 마감</h2>
+              <p class="muted small">현재 배정, 직업등급, 자기평가, 교사평가, 경고, 급여를 월별 기록으로 저장합니다.</p>
+              <button onclick="closeCurrentMonth()">이번 달 마감 기록 저장</button>
+              <div class="notice">마감 후 “다음 달 선택 순서 생성”을 누르면 C → B → A 순서로 자동 정렬됩니다.</div>
+            </div>
+          </div>
+
+          <div style="height:16px"></div>
+
+          <div class="card">
+            <h2>다음 달 직업 선택 순서</h2>
+            <div class="row">
+              <div>
+                <label for="orderSourceMonthSelect">선택 순서 기준 월(마감 기록)</label>
+                <select id="orderSourceMonthSelect"></select>
+              </div>
+              <div class="fit">
+                <button onclick="generateNextMonthOrder()">선택 순서 생성</button>
+              </div>
+            </div>
+            <div class="actions" style="margin-bottom:12px">
+              <button class="secondary" onclick="shuffleWithinGradeGroups()">같은 직업등급 안에서 랜덤 섞기</button>
+              <button class="danger" onclick="clearNextMonthOrder()">선택 순서 초기화</button>
+            </div>
+            <div id="nextOrderTable"></div>
+          </div>
+
+          <div style="height:16px"></div>
+
+          <div class="card choice-board-card">
+            <h2>큰 화면 직업 선택 진행</h2>
+            <p class="muted small">학생들과 큰 모니터로 보면서 순서대로 직업을 선택합니다. 정원이 찬 직업은 자동으로 막힙니다.</p>
+            <div class="choice-start-row">
+              <button onclick="startChoiceSession()">선택 진행 시작/초기화</button>
+              <button class="secondary" onclick="openChoiceStage()">큰 화면 열기</button>
+              <button class="secondary" onclick="confirmNextMonthAssignments()">선택 결과를 다음 달 직업으로 확정하고 월 이동</button>
+              <button class="danger" onclick="resetChoiceSelections()">선택 결과 초기화</button>
+            </div>
+            <div id="choiceSummaryTable"></div>
+          </div>
+
+          <div style="height:16px"></div>
+
+          <div class="card">
+            <h2>월별 기록</h2>
+            <div id="monthHistoryTable"></div>
+          </div>
+        </div>
+
+
+        <div id="tab-payroll" class="tab-page hidden">
+          <div class="card">
+            <h2>월급명세서 / 지급확인표 출력</h2>
+            <p class="muted small">
+              월 마감 기록을 기준으로 출력합니다. 따라서 다음 달 직업 배정이 이미 바뀌어도 전달 월급 기록은 보존됩니다.
+              은행 담당 학생에게 지급확인표를 주고, 실물 학급화폐 지급 후 서명을 받을 수 있습니다.
+            </p>
+            <div class="row">
+              <div>
+                <label for="payrollMonthSelect">출력할 월 기록</label>
+                <select id="payrollMonthSelect" onchange="renderPayrollPreview()"></select>
+              </div>
+              <div>
+                <label for="payrollPrintMode">출력 형식</label>
+                <select id="payrollPrintMode" onchange="renderPayrollPreview()">
+                  <option value="sheet">은행 담당용 지급확인표</option>
+                  <option value="slips">개별 월급명세서</option>
+                </select>
+              </div>
+              <div>
+                <label for="payrollPayDate">지급일</label>
+                <input id="payrollPayDate" placeholder="예: 2026. 6. 3." oninput="renderPayrollPreview()" />
+              </div>
+            </div>
+            <div class="payroll-actions no-print">
+              <button onclick="renderPayrollPreview()">미리보기 새로고침</button>
+              <button class="secondary" onclick="window.print()">인쇄하기</button>
+            </div>
+            <div id="printPayrollArea" class="print-area"></div>
+          </div>
+        </div>
+
+        <div id="tab-evaluation" class="tab-page hidden">
+          <div class="grid cols-2">
+            <div class="card">
+              <h2>월별 자기평가 열기</h2>
+              <p class="muted small">자기평가는 월별로 열고 닫습니다. 학생은 글을 쓰지 않고 1~5점만 제출합니다.</p>
+              <div id="selfEvalSessionStatus"></div>
+              <div class="actions" style="margin-top:12px">
+                <button onclick="openSelfEvalSession()">현재 월 자기평가 열기</button>
+                <button class="secondary" onclick="closeSelfEvalSession()">자기평가 마감</button>
+                <button class="danger" onclick="resetSelfEvalSession()">현재 월 응답 초기화</button>
+              </div>
+            </div>
+            <div class="card">
+              <h2>성과급 산정</h2>
+              <p class="muted small">학생 자기평가 점수는 참고용입니다. 최종 성과급은 교사가 상/중/하로 수동 입력합니다.</p>
+              <div class="notice">월 마감 시 현재 월 자기평가 점수와 교사 성과평가가 함께 저장됩니다.</div>
+            </div>
+          </div>
+
+          <div style="height:16px"></div>
+
+          <div class="card">
+            <h2>월말 평가 / 성과급 입력</h2>
+            <div id="evaluationTable"></div>
+          </div>
+        </div>
+
+        <div id="tab-settings" class="tab-page hidden">
+          <div class="grid cols-2">
+            <div class="card">
+              <h2>직업 기본급</h2>
+              <label>A등급 기본급</label><input id="baseA" type="number" />
+              <label>B등급 기본급</label><input id="baseB" type="number" />
+              <label>C등급 기본급</label><input id="baseC" type="number" />
+            </div>
+            <div class="card">
+              <h2>성과급</h2>
+              <label>상</label><input id="bonusHigh" type="number" />
+              <label>중</label><input id="bonusMid" type="number" />
+              <label>하</label><input id="bonusLow" type="number" />
+            </div>
+            <div class="card">
+              <h2>해고 / 대체수당</h2>
+              <label>D등급 고정 급여</label><input id="dPay" type="number" />
+              <label>대체 담당 추가수당</label><input id="substituteBonus" type="number" />
+              <div class="notice">D등급은 직업 등급이 아니라 해고 학생 개인에게만 적용되는 급여 처리입니다.</div>
+            </div>
+            <div class="card">
+              <h2>새 학년 초기화</h2>
+              <p class="muted small">작년 기록이 필요 없을 때 사용합니다. 학생 이름, 비밀번호, 직업 배정, 자기평가, 월마감 기록을 모두 새 학년 기본값으로 되돌립니다.</p>
+              <div class="notice">초기화 전 현재 데이터 백업 파일을 먼저 내려받을 수 있습니다. Firebase 연결 상태라면 초기화 결과도 클라우드에 저장됩니다.</div>
+              <div class="actions">
+                <button class="secondary" onclick="downloadStateBackup()">현재 데이터 백업</button>
+                <button class="danger" onclick="resetForNewSchoolYear()">새 학년 초기화</button>
+              </div>
+            </div>
+          </div>
+          <div style="height:12px"></div><button onclick="saveSalarySettings()">급여 설정 저장</button>
+        </div>
+      </section>
+
+      <section id="studentView" class="hidden student-home">
+        <div class="student-home-top">
+          <div class="student-home-main">
+            <div class="student-month-badge" id="studentMonthBadge">이번 달</div>
+            <h2 id="studentGreeting">학생 화면</h2>
+            <p id="studentHomeSub">내 직업과 제출할 일을 확인해요.</p>
+          </div>
+          <button class="secondary student-edit-btn" onclick="openStudentSetup(false)">내 정보 변경</button>
+        </div>
+        <div id="studentJobArea"></div>
+        <div id="studentGradeVoteArea"></div>
+        <div id="studentSelfEvalArea"></div>
+      </section>
+    </main>
+  </section>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script>
+const STORAGE_KEY = "ogu_job_center_v2";
+const CURRENCY_UNIT = "오구";
+
+/*
+  Firebase 연결 설정
+  1) Firebase 콘솔에서 웹 앱을 등록합니다.
+  2) firebaseConfig 객체를 복사합니다.
+  3) 아래 FIREBASE_CONFIG의 값만 그대로 교체합니다.
+  값이 PASTE_로 남아 있으면 앱은 안전하게 localStorage 모드로만 작동합니다.
+*/
+const firebaseConfig = {
+  apiKey: "AIzaSyDQfrlwI1MklZx4IS9Xg1RVqpJz3oHTAcM",
+  authDomain: "jobcenter-6afd2.firebaseapp.com",
+  projectId: "jobcenter-6afd2",
+  storageBucket: "jobcenter-6afd2.firebasestorage.app",
+  messagingSenderId: "387469810148",
+  appId: "1:387469810148:web:11aa1c46abed23bc79cff1"
+};
+const FIRESTORE_COLLECTION = "oguJobCenter";
+const FIRESTORE_DOC_ID = "class_5_9";
+const APP_VERSION = "v13.2.10";
+let db = null;
+let cloudSyncReady = false;
+let cloudSaveTimer = null;
+let isApplyingCloudState = false;
+let unsubscribeCloudState = null;
+
+function isFirebaseConfigFilled(){
+  return FIREBASE_CONFIG
+    && FIREBASE_CONFIG.apiKey && !String(FIREBASE_CONFIG.apiKey).includes("PASTE_")
+    && FIREBASE_CONFIG.projectId && !String(FIREBASE_CONFIG.projectId).includes("PASTE_")
+    && FIREBASE_CONFIG.appId && !String(FIREBASE_CONFIG.appId).includes("PASTE_");
+}
+
+function setCloudStatus(text, type="local"){
+  const el = document.getElementById("cloudStatus");
+  if(!el) return;
+  el.textContent = text;
+  el.className = `cloud-status cloud-${type}`;
+}
+
+function renderAfterCloudStateUpdate(){
+  renderLoginStudents();
+  if(currentUser?.role === "teacher") renderAdmin();
+  if(currentUser?.role === "student"){
+    if(getStudent(currentUser.studentId)) renderStudent();
+    else logout();
+  }
+}
+
+async function initCloudSync(){
+  if(!isFirebaseConfigFilled()){
+    setCloudStatus("로컬 저장", "local");
+    console.log("Firebase config가 비어 있어 localStorage 모드로 실행합니다.");
+    return;
+  }
+  if(!window.firebase){
+    setCloudStatus("SDK 없음", "error");
+    console.error("Firebase SDK를 불러오지 못했습니다.");
+    return;
+  }
+  try{
+    if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.firestore();
+    cloudSyncReady = true;
+    setCloudStatus("연결 중", "saving");
+
+    const ref = db.collection(FIRESTORE_COLLECTION).doc(FIRESTORE_DOC_ID);
+    const snap = await ref.get();
+
+    if(snap.exists && snap.data()?.state){
+      isApplyingCloudState = true;
+      state = normalizeLoadedState(snap.data().state);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      isApplyingCloudState = false;
+      renderAfterCloudStateUpdate();
+      setCloudStatus("클라우드 연결", "ok");
+    }else{
+      await ref.set({
+        state,
+        appVersion:APP_VERSION,
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
+      setCloudStatus("클라우드 생성", "ok");
+    }
+
+    if(unsubscribeCloudState) unsubscribeCloudState();
+    unsubscribeCloudState = ref.onSnapshot(doc=>{
+      if(!doc.exists || !doc.data()?.state) return;
+      isApplyingCloudState = true;
+      state = normalizeLoadedState(doc.data().state);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      isApplyingCloudState = false;
+      renderAfterCloudStateUpdate();
+      setCloudStatus("클라우드 동기화", "ok");
+    }, err=>{
+      console.error(err);
+      setCloudStatus("동기화 오류", "error");
+    });
+  }catch(err){
+    console.error(err);
+    cloudSyncReady = false;
+    setCloudStatus("Firebase 오류", "error");
+  }
+}
+
+function scheduleCloudSave(){
+  if(!cloudSyncReady || !db || isApplyingCloudState) return;
+  clearTimeout(cloudSaveTimer);
+  cloudSaveTimer = setTimeout(writeStateToCloud, 500);
+}
+
+function mergeStudentProfilesForStudentSave(remoteState, localState, studentId){
+  const remoteStudents = Array.isArray(remoteState.students) ? remoteState.students : [];
+  const localStudents = Array.isArray(localState.students) ? localState.students : [];
+  const localStudent = localStudents.find(s=>s.id === studentId);
+  if(!localStudent) return remoteStudents;
+  const seen = new Set();
+  const merged = remoteStudents.map(s=>{
+    if(s.id !== studentId) return s;
+    seen.add(s.id);
+    return {...s, ...localStudent};
+  });
+  if(!seen.has(studentId)) merged.push(localStudent);
+  return merged;
+}
+
+function mergeSelfEvalResponses(remoteSessions, localSessions, studentId=null){
+  const merged = {...(remoteSessions || {})};
+  Object.entries(localSessions || {}).forEach(([monthKey, localSession])=>{
+    const remoteSession = merged[monthKey] || {};
+    const remoteResponses = remoteSession.responses || {};
+    const localResponses = localSession.responses || {};
+    const responses = {...remoteResponses};
+    if(studentId){
+      if(localResponses[studentId]) responses[studentId] = localResponses[studentId];
+    }else{
+      Object.assign(responses, localResponses);
+    }
+    merged[monthKey] = {...remoteSession, ...localSession, responses};
+  });
+  return merged;
+}
+
+function mergeGradeVoteResponses(remoteVote, localVote, studentId=null){
+  if(!remoteVote && !localVote) return null;
+  if(!remoteVote) return localVote;
+  if(!localVote) return remoteVote;
+  const responses = {...(remoteVote.responses || {})};
+  const localResponses = localVote.responses || {};
+  if(studentId){
+    if(localResponses[studentId]) responses[studentId] = localResponses[studentId];
+  }else{
+    Object.assign(responses, localResponses);
+  }
+  return {...remoteVote, ...localVote, responses};
+}
+
+function mergeStateForCloudSave(remoteState, localState, user){
+  const remote = normalizeLoadedState(remoteState || {});
+  const local = normalizeLoadedState(localState || {});
+
+  if(user?.role === "student" && user.studentId){
+    const sid = user.studentId;
+    return normalizeLoadedState({
+      ...remote,
+      students: mergeStudentProfilesForStudentSave(remote, local, sid),
+      selfEvalSessions: mergeSelfEvalResponses(remote.selfEvalSessions, local.selfEvalSessions, sid),
+      gradeVote: mergeGradeVoteResponses(remote.gradeVote, local.gradeVote, sid)
+    });
+  }
+
+  // 교사 저장은 운영 기준을 우선 반영하되, 거의 동시에 들어온 학생 자기평가/등급투표 응답은 잃지 않도록 합칩니다.
+  return normalizeLoadedState({
+    ...local,
+    selfEvalSessions: mergeSelfEvalResponses(remote.selfEvalSessions, local.selfEvalSessions, null),
+    gradeVote: mergeGradeVoteResponses(remote.gradeVote, local.gradeVote, null)
+  });
+}
+
+async function writeStateToCloud(){
+  if(!cloudSyncReady || !db || isApplyingCloudState) return;
+  try{
+    setCloudStatus("저장 중", "saving");
+    const ref = db.collection(FIRESTORE_COLLECTION).doc(FIRESTORE_DOC_ID);
+    const userAtSave = currentUser ? {...currentUser} : null;
+    const mergedState = await db.runTransaction(async tx=>{
+      const snap = await tx.get(ref);
+      const remoteState = snap.exists && snap.data()?.state ? snap.data().state : null;
+      const nextState = remoteState ? mergeStateForCloudSave(remoteState, state, userAtSave) : normalizeLoadedState(state);
+      tx.set(ref, {
+        state:nextState,
+        appVersion:APP_VERSION,
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      }, {merge:true});
+      return nextState;
+    });
+    isApplyingCloudState = true;
+    state = mergedState;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    isApplyingCloudState = false;
+    renderAfterCloudStateUpdate();
+    setCloudStatus("저장 완료", "ok");
+  }catch(err){
+    console.error(err);
+    setCloudStatus("저장 오류", "error");
+  }
+}
+
+
+function makeId(prefix){ return prefix + "_" + Math.random().toString(36).slice(2,10); }
+function formatCurrency(value){ return `${Number(value || 0).toLocaleString()}${CURRENCY_UNIT}`; }
+function normalizeMonthNumber(value, fallback=5){
+  const n = Number(value);
+  if(Number.isFinite(n) && (n === -1 || n === 0 || (n >= 1 && n <= 12))) return n;
+  return fallback;
+}
+function monthLabel(monthNumber){
+  const n = normalizeMonthNumber(monthNumber, 5);
+  if(n === 0) return "테스트월";
+  if(n === -1) return "테스트2월";
+  return `${n}월`;
+}
+function parseMonthNumber(value){
+  if(value === 0 || value === "0") return 0;
+  if(value === -1 || value === "-1") return -1;
+  const v = String(value ?? "");
+  if(v.includes("테스트2")) return -1;
+  if(v.includes("테스트")) return 0;
+  const m = v.match(/(1[0-2]|[1-9])\s*월?/);
+  return m ? Number(m[1]) : 5;
+}
+function getCurrentMonthNumber(){
+  const value = state?.currentMonthNumber ?? (state?.currentMonth ? parseMonthNumber(state.currentMonth) : 5);
+  return normalizeMonthNumber(value, 5);
+}
+function getHistoryMonthNumber(historyItem){
+  return normalizeMonthNumber(historyItem?.monthNumber ?? parseMonthNumber(historyItem?.month), 5);
+}
+function getHistoryMonthLabel(historyItem){
+  return monthLabel(getHistoryMonthNumber(historyItem));
+}
+
+function createDefaultJobs(){
+  return [
+    {id:"j1", name:"청소", grade:"C", capacity:4, desc:"교실과 주변을 깨끗하게 정리하고 친구들이 함께 쓸 공간을 살핍니다."},
+    {id:"j2", name:"은행&마트", grade:"A", capacity:2, desc:"학급화폐와 마트 운영을 도와 입출금, 판매, 기록을 꼼꼼히 확인합니다."},
+    {id:"j3", name:"경비", grade:"B", capacity:2, desc:"교실 안전과 질서를 살피고 이동이나 쉬는 시간에 필요한 안내를 돕습니다."},
+    {id:"j4", name:"디벗", grade:"A", capacity:2, desc:"디지털 기기 사용과 정리를 돕고 수업 전후 기기 상태를 확인합니다."},
+    {id:"j5", name:"수합", grade:"B", capacity:2, desc:"과제, 안내장, 준비물 등을 빠짐없이 걷고 정리합니다."},
+    {id:"j6", name:"심부름", grade:"C", capacity:4, desc:"선생님과 학급에 필요한 간단한 전달과 심부름을 맡습니다."},
+    {id:"j7", name:"급식", grade:"B", capacity:4, desc:"급식 준비와 정리, 이동 질서를 돕고 친구들이 편하게 식사하도록 살핍니다."},
+    {id:"j8", name:"알림장&양치", grade:"B", capacity:2, desc:"알림장 확인과 양치 관련 안내를 도와 학급 생활 습관을 챙깁니다."},
+    {id:"j9", name:"우유", grade:"C", capacity:2, desc:"우유 배부와 정리를 돕고 남은 물품을 확인합니다."},
+    {id:"j10", name:"칠판", grade:"C", capacity:2, desc:"수업 전후 칠판을 깨끗하게 정리하고 필요한 안내를 적습니다."}
+  ];
+}
+
+function applyRequestedDefaultData(targetState){
+  if(!targetState) return targetState;
+
+  targetState.basePay = targetState.basePay || {};
+  if(targetState.basePay.A === undefined || Number(targetState.basePay.A) === 1200) targetState.basePay.A = 1300;
+  if(targetState.basePay.B === undefined || Number(targetState.basePay.B) === 900) targetState.basePay.B = 1000;
+  if(targetState.basePay.C === undefined) targetState.basePay.C = 700;
+
+  // 이미 배포된 브라우저의 학생 이름/비밀번호/프로필 설정은 절대 자동으로 되돌리지 않습니다.
+  // 1번 학생 같은 기본 이름은 새로 초기화되는 데이터에서만 만들어집니다.
+
+  const legacyNames = ["칠판 담당","불끄미","줄 담당","게시판 담당","금고 보조","준비물 담당","분리수거 담당","도서 담당","급식 안내 담당","학급 공지 담당"];
+  const shouldReplaceJobs = !Array.isArray(targetState.jobs)
+    || targetState.jobs.length !== 10
+    || targetState.jobs.some(j=>legacyNames.includes(j.name));
+  if(shouldReplaceJobs){
+    targetState.jobs = createDefaultJobs();
+  }
+
+  return targetState;
+}
+
+function createDefaultState(){
+  const students = Array.from({length:26}, (_,i)=>({ id:"s"+(i+1), name:(i+1)+"번 학생", password:"123456", isProfileSet:false }));
+  const jobs = createDefaultJobs();
+  const assignments = {};
+  students.slice(0,10).forEach((s,i)=>{
+    assignments[s.id] = {jobId:jobs[i].id, performance:"중", warnings:0, selfScore:"", selfEval:"", status:"active", substituteDuties:[]};
+  });
+  return {
+    teacherPassword:"89338933",
+    basePay:{A:1300,B:1000,C:700},
+    bonusPay:{상:300,중:200,하:100},
+    dismissalSettings:{dPay:500, substituteBonus:300},
+    students, jobs, assignments,
+    currentMonthNumber:5,
+    monthHistory:[],
+    nextMonthOrder:[],
+    choiceSession:{activeIndex:0, selections:{}, finalized:false},
+    selfEvalSessions:{},
+    gradeVote:null
+  };
+}
+
+let state = loadState();
+let currentUser = null;
+let currentVoteJobIndex = 0;
+let draftSystemMonthNumber = null;
+
+function normalizeLoadedState(parsed){
+  if(!parsed || typeof parsed !== "object") return applyRequestedDefaultData(createDefaultState());
+  if(parsed.teacherPassword === "8933") parsed.teacherPassword = "89338933";
+  if(!parsed.teacherPassword) parsed.teacherPassword = "89338933";
+  if(!("gradeVote" in parsed)) parsed.gradeVote = null;
+  if(!("currentMonthNumber" in parsed)){
+    parsed.currentMonthNumber = parsed.currentMonth ? parseMonthNumber(parsed.currentMonth) : 5;
+  }
+  parsed.currentMonthNumber = normalizeMonthNumber(parsed.currentMonthNumber ?? parseMonthNumber(parsed.currentMonth), 5);
+  parsed.currentMonth = monthLabel(parsed.currentMonthNumber);
+  if(!("monthHistory" in parsed)) parsed.monthHistory = [];
+  if(!("nextMonthOrder" in parsed)) parsed.nextMonthOrder = [];
+  if(!("choiceSession" in parsed)) parsed.choiceSession = {activeIndex:0, selections:{}, finalized:false};
+  if(!parsed.choiceSession) parsed.choiceSession = {activeIndex:0, selections:{}, finalized:false};
+  if(!("selfEvalSessions" in parsed)) parsed.selfEvalSessions = {};
+  if(!("dismissalSettings" in parsed)) parsed.dismissalSettings = {dPay:500, substituteBonus:300};
+  if(!parsed.dismissalSettings) parsed.dismissalSettings = {dPay:500, substituteBonus:300};
+  if(parsed.assignments){
+    Object.keys(parsed.assignments).forEach(sid=>{
+      const a = parsed.assignments[sid];
+      if(!("status" in a)) a.status = "active";
+      if(!("substituteDuties" in a)) a.substituteDuties = [];
+    });
+  }
+  if(Array.isArray(parsed.jobs)){
+    parsed.jobs = parsed.jobs.map(j => ({capacity:1, ...j, capacity:Number(j.capacity || 1)}));
+  }
+  if(Array.isArray(parsed.students)){
+    parsed.students = parsed.students.map((s,idx)=>{
+      const profileSet = Boolean(s.isProfileSet);
+      return {
+        ...s,
+        password: profileSet ? String(s.password || "123456") : "123456",
+        isProfileSet: profileSet
+      };
+    });
+  }
+  return applyRequestedDefaultData(parsed);
+}
+
+function loadState(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(!raw){
+    const initial = applyRequestedDefaultData(createDefaultState());
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
+    return initial;
+  }
+  try{
+    return normalizeLoadedState(JSON.parse(raw));
+  }catch(e){
+    const initial = applyRequestedDefaultData(createDefaultState());
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
+    return initial;
+  }
+}
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  scheduleCloudSave();
+}
+
+function downloadStateBackup(){
+  const now = new Date();
+  const dateText = now.toISOString().slice(0,10);
+  const monthText = monthLabel(getCurrentMonthNumber()).replace(/[^0-9가-힣_-]/g, "");
+  const payload = {
+    app:"오구 직업센터",
+    appVersion:APP_VERSION,
+    exportedAt:now.toISOString(),
+    note:"새 학년 초기화 전 백업 파일입니다. 필요할 때 개발자에게 전달하면 복구 자료로 사용할 수 있습니다.",
+    state
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `ogu_job_center_backup_${monthText}_${dateText}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+async function forceSaveStateToCloud(){
+  if(!cloudSyncReady || !db) return;
+  try{
+    clearTimeout(cloudSaveTimer);
+    setCloudStatus("초기화 저장 중", "saving");
+    const ref = db.collection(FIRESTORE_COLLECTION).doc(FIRESTORE_DOC_ID);
+    await ref.set({
+      state:normalizeLoadedState(state),
+      appVersion:APP_VERSION,
+      resetAt:firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
+    setCloudStatus("초기화 저장 완료", "ok");
+  }catch(err){
+    console.error(err);
+    setCloudStatus("초기화 저장 오류", "error");
+    alert("로컬 초기화는 완료되었지만 Firebase 저장 중 오류가 났습니다. 인터넷 연결과 Firestore 규칙을 확인해 주세요.");
+  }
+}
+
+async function resetForNewSchoolYear(){
+  const phrase = prompt("새 학년 초기화는 학생 이름, 비밀번호, 직업 배정, 자기평가, 월마감 기록을 모두 지웁니다. 계속하려면 '새학년초기화'를 정확히 입력하세요.");
+  if(phrase !== "새학년초기화") return;
+  downloadStateBackup();
+  const next = createDefaultState();
+  next.currentMonthNumber = 3;
+  next.currentMonth = monthLabel(3);
+  state = applyRequestedDefaultData(next);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  renderAfterCloudStateUpdate();
+  await forceSaveStateToCloud();
+  alert("새 학년 초기화가 완료되었습니다. 기준 월은 3월로 설정되었습니다.");
+}
+
+function resetAllData(){
+  resetForNewSchoolYear();
+}
+function showMessage(text){
+  const el = document.getElementById("loginMsg"); el.textContent = text; el.classList.remove("hidden");
+  setTimeout(()=>el.classList.add("hidden"), 3000);
+}
+function switchLogin(type){
+  document.getElementById("teacherTab").classList.toggle("active", type==="teacher");
+  document.getElementById("studentTab").classList.toggle("active", type==="student");
+  document.getElementById("teacherLoginBox").classList.toggle("hidden", type!=="teacher");
+  document.getElementById("studentLoginBox").classList.toggle("hidden", type!=="student");
+}
+function renderLoginStudents(){
+  document.getElementById("studentSelect").innerHTML = state.students.map(s=>`<option value="${s.id}">${escapeHtml(s.name)}</option>`).join("");
+}
+function loginTeacher(){
+  const pw = document.getElementById("teacherPw").value.trim();
+  if(pw !== state.teacherPassword){ showMessage("관리자 비밀번호가 맞지 않습니다."); return; }
+  currentUser = {role:"teacher"};
+  document.getElementById("loginScreen").classList.add("hidden");
+  document.getElementById("appScreen").classList.remove("hidden");
+  document.getElementById("adminView").classList.remove("hidden");
+  document.getElementById("studentView").classList.add("hidden");
+  document.getElementById("pageTitle").textContent = "오구 직업센터 관리자";
+  document.getElementById("pageSub").textContent = "학생·직업·투표·평가·급여 관리";
+  renderAdmin();
+}
+function loginStudent(){
+  const studentId = document.getElementById("studentSelect").value;
+  const pw = document.getElementById("studentPw").value.trim();
+  const student = state.students.find(s=>s.id===studentId);
+  if(!student || student.password !== pw){ showMessage("학생 비밀번호가 맞지 않습니다."); return; }
+  currentUser = {role:"student", studentId};
+  document.getElementById("loginScreen").classList.add("hidden");
+  document.getElementById("appScreen").classList.remove("hidden");
+  document.getElementById("adminView").classList.add("hidden");
+  document.getElementById("studentView").classList.remove("hidden");
+  document.getElementById("pageTitle").textContent = "오구 직업센터 학생";
+  document.getElementById("pageSub").textContent = student.name + " 학생 화면";
+  renderStudent();
+  if(!student.isProfileSet) openStudentSetup(true);
+}
+function logout(){
+  currentUser = null;
+  document.getElementById("teacherPw").value = "";
+  document.getElementById("studentPw").value = "";
+  document.getElementById("loginScreen").classList.remove("hidden");
+  document.getElementById("appScreen").classList.add("hidden");
+}
+function showTab(tabName, btn){
+  document.querySelectorAll(".tab-page").forEach(el=>el.classList.add("hidden"));
+  document.getElementById("tab-"+tabName).classList.remove("hidden");
+  document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  renderAdmin();
+}
+function getJob(jobId){ return state.jobs.find(j=>j.id===jobId); }
+function getStudent(studentId){ return state.students.find(s=>s.id===studentId); }
+function calculateSalary(studentId){
+  const a = state.assignments[studentId]; 
+  if(!a) return 0;
+  if(a.status === "dismissed"){
+    return Number(state.dismissalSettings?.dPay || 500);
+  }
+  const job = getJob(a.jobId); 
+  if(!job) return 0;
+  const base = Number(state.basePay[job.grade] || 0);
+  const bonus = Number(state.bonusPay[a.performance] || 0);
+  const substituteBonus = (a.substituteDuties || []).reduce((sum,d)=>sum+Number(d.bonus || state.dismissalSettings?.substituteBonus || 300),0);
+  return base + bonus + substituteBonus;
+}
+function getPayGradeForStudent(studentId){
+  const a = state.assignments[studentId];
+  if(!a) return "";
+  if(a.status === "dismissed") return "D";
+  const job = getJob(a.jobId);
+  return job?.grade || "";
+}
+function getBasePayForStudent(studentId){
+  const a = state.assignments[studentId];
+  if(!a) return 0;
+  if(a.status === "dismissed") return Number(state.dismissalSettings?.dPay || 500);
+  const job = getJob(a.jobId);
+  return job ? Number(state.basePay[job.grade] || 0) : 0;
+}
+function getBonusPayForStudent(studentId){
+  const a = state.assignments[studentId];
+  if(!a) return 0;
+  if(a.status === "dismissed") return 0;
+  return Number(state.bonusPay[a.performance] || 0);
+}
+function getSubstituteBonusForStudent(studentId){
+  const a = state.assignments[studentId];
+  if(!a) return 0;
+  return (a.substituteDuties || []).reduce((sum,d)=>sum+Number(d.bonus || state.dismissalSettings?.substituteBonus || 300),0);
+}
+function gradePill(grade){ 
+  if(!["A","B","C","D"].includes(String(grade))) return `<span class="pill">${escapeHtml(grade)}</span>`;
+  return `<span class="pill ${String(grade).toLowerCase()}">${grade}</span>`; 
+}
+function perfPill(perf){ const cls = perf==="상" ? "ok" : perf==="중" ? "warn" : "bad"; return `<span class="pill ${cls}">${perf}</span>`; }
+
+
+
+
+function getNextMonthNumber(monthNumber){
+  const n = Number(monthNumber);
+  if(n === 0) return -1;      // 테스트월 → 테스트2월
+  if(n === -1) return -1;     // 테스트2월은 테스트 흐름의 마지막
+  if(n >= 1 && n <= 11) return n + 1;
+  if(n === 12) return 3;      // 다음 학년도 시작용 기본값
+  return n;
+}
+function getNextMonthLabel(monthNumber){
+  return monthLabel(getNextMonthNumber(monthNumber));
+}
+
+function getMonthOptions(){
+  return [
+    {num:0, label:"테스트월", hint:"테스트 시작"},
+    {num:-1, label:"테스트2월", hint:"테스트 다음 달"},
+    {num:1, label:"1월", hint:"방학"},
+    {num:2, label:"2월", hint:"방학"},
+    {num:3, label:"3월", hint:""},
+    {num:4, label:"4월", hint:""},
+    {num:5, label:"5월", hint:""},
+    {num:6, label:"6월", hint:""},
+    {num:7, label:"7월", hint:""},
+    {num:8, label:"8월", hint:""},
+    {num:9, label:"9월", hint:""},
+    {num:10, label:"10월", hint:""},
+    {num:11, label:"11월", hint:""},
+    {num:12, label:"12월", hint:""}
+  ];
+}
+
+function setSystemMonth(monthNumber){
+  const n = normalizeMonthNumber(monthNumber, getCurrentMonthNumber());
+  state.currentMonthNumber = n;
+  state.currentMonth = monthLabel(n);
+  draftSystemMonthNumber = n;
+  saveState();
+  renderSystemMonthPanel();
+  renderMonthSelectGrid();
+  if(currentUser?.role === "teacher") renderAdmin();
+  if(currentUser?.role === "student") renderStudent();
+}
+
+function getDraftSystemMonthNumber(){
+  if(draftSystemMonthNumber === null || draftSystemMonthNumber === undefined){
+    draftSystemMonthNumber = getCurrentMonthNumber();
+  }
+  return normalizeMonthNumber(draftSystemMonthNumber, getCurrentMonthNumber());
+}
+
+function selectSystemMonthDraft(monthNumber){
+  draftSystemMonthNumber = normalizeMonthNumber(monthNumber, getCurrentMonthNumber());
+  renderSystemMonthPanel();
+}
+
+function resetSystemMonthDraft(){
+  draftSystemMonthNumber = getCurrentMonthNumber();
+  renderSystemMonthPanel();
+}
+
+function applySystemMonth(){
+  const selected = getDraftSystemMonthNumber();
+  const current = getCurrentMonthNumber();
+  if(selected === current){
+    alert(`${monthLabel(selected)}이 이미 시스템 기준 월로 적용되어 있습니다.`);
+    renderSystemMonthPanel();
+    return;
+  }
+  if(!confirm(`시스템 기준 월을 ${monthLabel(current)}에서 ${monthLabel(selected)}로 바꿀까요?\n\n자기평가 열기/제출, 월말 평가, 월 마감, 월급 출력 기준 표시, 다음 달 확정 이동 기준이 모두 ${monthLabel(selected)} 기준으로 작동합니다.`)) return;
+  setSystemMonth(selected);
+  alert(`시스템 기준 월을 ${monthLabel(selected)}로 적용했습니다.`);
+}
+
+function renderSystemMonthPanel(){
+  const panel = document.getElementById("systemMonthPanelMain");
+  if(!panel) return;
+  const current = getCurrentMonthNumber();
+  const draft = getDraftSystemMonthNumber();
+  const changed = current !== draft;
+  const chips = getMonthOptions().map(m=>{
+    const active = draft === Number(m.num);
+    const isTest = (m.num === 0 || m.num === -1);
+    const cls = ["month-chip", isTest ? "test-month" : "", active ? "active" : ""].filter(Boolean).join(" ");
+    return `<button type="button" class="${cls}" data-month="${m.num}" onclick="selectSystemMonthDraft(${m.num})">
+      <strong>${m.label}</strong>${m.hint ? `<br><span>${m.hint}</span>` : ""}
+    </button>`;
+  }).join("");
+  panel.innerHTML = `
+    <div class="grid cols-2">
+      <div class="stat">
+        <div class="label">현재 적용된 시스템 월</div>
+        <div class="num">${monthLabel(current)}</div>
+        <div class="muted small">지금 앱 전체가 실제로 사용 중인 기준 월입니다.</div>
+      </div>
+      <div class="stat">
+        <div class="label">선택한 월</div>
+        <div class="num">${monthLabel(draft)}</div>
+        <div class="muted small">${changed ? "아직 적용 전입니다. 아래 적용 버튼을 눌러야 바뀝니다." : "현재 시스템 월과 같습니다."}</div>
+      </div>
+    </div>
+    <div class="month-chip-wrap">${chips}</div>
+    <div class="actions" style="margin-top:12px">
+      <button onclick="applySystemMonth()">선택한 월을 시스템 기준으로 적용</button>
+      <button class="gray" onclick="resetSystemMonthDraft()">선택 취소</button>
+    </div>
+    <div class="notice"><strong>월 설정은 월 마감 없이 바로 적용됩니다.</strong> 자기평가, 월말 평가, 월 마감 저장, 학생 화면 월 표시가 이 기준 월을 사용합니다.</div>
+    <div class="successbox"><strong>선택 순서 생성만 예외입니다.</strong> 다음 달 직업 선택 순서는 실제 수행 결과가 필요하므로, 해당 월을 마감 저장한 기록을 기준으로 생성합니다.</div>
+    <div class="notice"><strong>테스트월 → 테스트2월</strong> 흐름으로 실제 월 넘김을 연습할 수 있습니다. 현재 기준으로 다음 달 확정 시 ${getNextMonthLabel(current)}로 이동합니다.</div>
+  `;
+}
+
+function formatSubstituteDuties(studentId){
+  const a = state.assignments[studentId];
+  const duties = a?.substituteDuties || [];
+  if(!duties.length) return "";
+  return duties.map(d=>{
+    const student = getStudent(d.fromStudentId);
+    return `${escapeHtml(d.jobName || "대체 역할")} 대체(+${formatCurrency(d.bonus || 0)}, ${escapeHtml(student?.name || "해고 학생")})`;
+  }).join("<br>");
+}
+function getDismissedInfo(studentId){
+  const a = state.assignments[studentId];
+  if(!a || a.status !== "dismissed") return "";
+  const sub = a.dismissal?.substituteStudentId ? getStudent(a.dismissal.substituteStudentId) : null;
+  return `직무 교체: D등급 ${formatCurrency(state.dismissalSettings?.dPay || 500)} / 대체 담당 ${escapeHtml(sub?.name || "-")}`;
+}
+
+function renderAdmin(){
+  document.getElementById("statStudents").textContent = state.students.length;
+  document.getElementById("statJobs").textContent = state.jobs.length;
+  document.getElementById("statAssigned").textContent = Object.keys(state.assignments).length;
+  renderAssignmentTable(); renderStudentSelects(); renderBulkAssignmentTable(); renderStudentTable(); renderJobTable(); renderGradeVoteAdmin(); renderMonthAdmin(); renderSystemMonthPanel(); renderChoiceSummary(); renderPayrollAdmin(); renderSelfEvalSessionStatus(); renderEvaluationTable(); renderSettings();
+}
+function renderStudentSelects(){
+  document.getElementById("assignStudent").innerHTML = state.students.map(s=>`<option value="${s.id}">${escapeHtml(s.name)}</option>`).join("");
+  document.getElementById("assignJob").innerHTML = state.jobs.map(j=>`<option value="${j.id}">${escapeHtml(j.name)} (${j.grade})</option>`).join("");
+}
+function renderAssignmentTable(){
+  const rows = state.students.map(s=>{
+    const a = state.assignments[s.id]; const job = a ? getJob(a.jobId) : null;
+    if(!job) return `<tr><td>${escapeHtml(s.name)}</td><td colspan="6" class="muted">아직 배정된 직업이 없습니다.</td></tr>`;
+    const dismissed = a.status === "dismissed";
+    const substituteInfo = formatSubstituteDuties(s.id);
+    const statusText = dismissed ? `<span class="pill d">D 처리</span><br><span class="small">${getDismissedInfo(s.id)}</span>` : (substituteInfo ? `<span class="pill ok">대체 담당</span><br><span class="small">${substituteInfo}</span>` : '<span class="pill ok">정상</span>');
+    return `<tr class="${dismissed ? "dismissed-row" : substituteInfo ? "sub-duty-row" : ""}"><td><strong>${escapeHtml(s.name)}</strong></td><td>${escapeHtml(job.name)}</td><td>${gradePill(job.grade)}</td><td>${gradePill(getPayGradeForStudent(s.id))}</td><td>${dismissed ? '<span class="muted">없음</span>' : perfPill(a.performance || "중")}</td><td>${a.warnings || 0}회</td><td>${statusText}</td><td><strong>${formatCurrency(calculateSalary(s.id))}</strong></td><td class="actions"><button class="secondary" onclick="addWarning('${s.id}')">경고 +1</button><button class="gray" onclick="clearWarning('${s.id}')">경고 초기화</button>${(a.warnings||0)>=3 && !dismissed ? `<button class="danger" onclick="openDismissalProcess('${s.id}')">직무 교체</button>` : ""}${dismissed ? `<button class="gray" onclick="cancelDismissal('${s.id}')">D처리 취소</button>` : ""}</td></tr>`;
+  }).join("");
+  document.getElementById("assignmentTable").innerHTML = `<table><thead><tr><th>학생</th><th>직업</th><th>직업 등급</th><th>급여 적용</th><th>성과평가</th><th>경고</th><th>상태</th><th>예상 급여</th><th>처리</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+function renderStudentTable(){
+  const rows = state.students.map(s=>{
+    const a = state.assignments[s.id]; const job = a ? getJob(a.jobId) : null;
+    return `<tr><td><strong>${escapeHtml(s.name)}</strong></td><td>${s.isProfileSet ? '<span class="pill ok">설정 완료</span>' : '<span class="pill warn">초기 상태</span>'}</td><td>${escapeHtml(s.password)}</td><td>${job ? escapeHtml(job.name) : '<span class="muted">미배정</span>'}</td><td class="actions"><button class="secondary" onclick="resetStudentPassword('${s.id}')">비번 초기화</button><button class="danger" onclick="deleteStudent('${s.id}')">삭제</button></td></tr>`;
+  }).join("");
+  document.getElementById("studentTable").innerHTML = `<table><thead><tr><th>학생</th><th>프로필</th><th>현재 비밀번호</th><th>현재 직업</th><th>관리</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+function renderJobTable(){
+  const rows = state.jobs.map(j=>{
+    const count = Object.values(state.assignments).filter(a=>a.jobId===j.id).length;
+    return `<tr>
+      <td><input id="job_name_${j.id}" value="${escapeHtml(j.name)}" /></td>
+      <td>
+        <select id="job_grade_${j.id}">
+          <option value="A" ${j.grade==="A"?"selected":""}>A</option>
+          <option value="B" ${j.grade==="B"?"selected":""}>B</option>
+          <option value="C" ${j.grade==="C"?"selected":""}>C</option>
+        </select>
+      </td>
+      <td><input id="job_capacity_${j.id}" type="number" min="1" value="${Number(j.capacity || 1)}" /></td>
+      <td><textarea id="job_desc_${j.id}" style="min-height:70px">${escapeHtml(j.desc || "")}</textarea></td>
+      <td>${count}명 / ${Number(j.capacity || 1)}명<br><span class="small muted">현재 등급 ${gradePill(j.grade)}</span></td>
+      <td class="actions">
+        <button class="secondary" onclick="saveJobFromTable('${j.id}')">수정 저장</button>
+        <button class="danger" onclick="deleteJob('${j.id}')">삭제</button>
+      </td>
+    </tr>`;
+  }).join("");
+  document.getElementById("jobTable").innerHTML = `
+    <div class="notice">직업 이름, 등급, 정원, 설명을 직접 수정한 뒤 <strong>수정 저장</strong>을 누르세요. 직업 등급을 바꾸면 현재 배정 학생의 예상 월급도 함께 바뀝니다.</div>
+    <table><thead><tr><th>직업 이름</th><th>등급</th><th>정원</th><th>설명</th><th>배정 현황</th><th>관리</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+function renderEvaluationTable(){
+  const monthNumber = getCurrentMonthNumber();
+  const session = getSelfEvalSession(monthNumber);
+  const responses = session.responses || {};
+  const rows = state.students.map(s=>{
+    const a = state.assignments[s.id];
+    const job = a ? getJob(a.jobId) : null;
+    if(!a || !job) return `<tr><td>${escapeHtml(s.name)}</td><td colspan="9" class="muted">직업 미배정</td></tr>`;
+    const response = responses[s.id];
+    const submitStatus = response
+      ? `<span class="pill ok">제출</span>`
+      : `<span class="pill bad">미제출</span>`;
+    const avg = response ? getSelfEvalAverage(response) : null;
+    const scoreText = response ? `<strong>${avg}점</strong>` : '<span class="muted">-</span>';
+    const submittedAt = response ? new Date(response.submittedAt).toLocaleString("ko-KR") : "-";
+    const tip = response?.tip ? escapeHtml(response.tip) : '<span class="muted">-</span>';
+    const detail = response ? formatSelfEvalScores(response) : '<span class="muted">-</span>';
+    return `<tr>
+      <td><strong>${escapeHtml(s.name)}</strong></td>
+      <td>${escapeHtml(job.name)} ${gradePill(job.grade)}</td>
+      <td>${submitStatus}</td>
+      <td class="center">${scoreText}</td>
+      <td class="small">${detail}</td>
+      <td class="tip-cell">${tip}</td>
+      <td>
+        ${a.status === "dismissed" ? '<span class="pill d">D / 성과급 없음</span>' : `<select onchange="setPerformance('${s.id}', this.value)">
+          <option value="상" ${a.performance==="상"?"selected":""}>상 (+${formatCurrency(state.bonusPay.상)})</option>
+          <option value="중" ${a.performance==="중"?"selected":""}>중 (+${formatCurrency(state.bonusPay.중)})</option>
+          <option value="하" ${a.performance==="하"?"selected":""}>하 (+${formatCurrency(state.bonusPay.하)})</option>
+        </select>`}
+      </td>
+      <td>${formatSubstituteDuties(s.id) || '<span class="muted">-</span>'}</td>
+      <td><strong>${formatCurrency(calculateSalary(s.id))}</strong></td>
+    </tr>`;
+  }).join("");
+  document.getElementById("evaluationTable").innerHTML = `
+    <table>
+      <thead>
+        <tr><th>학생</th><th>직업</th><th>자기평가</th><th>평균</th><th>문항별 점수</th><th>꿀팁 한 줄</th><th>교사 성과평가</th><th>대체수당</th><th>최종 급여</th></tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+function renderSettings(){
+  document.getElementById("baseA").value = state.basePay.A; document.getElementById("baseB").value = state.basePay.B; document.getElementById("baseC").value = state.basePay.C;
+  document.getElementById("bonusHigh").value = state.bonusPay.상; document.getElementById("bonusMid").value = state.bonusPay.중; document.getElementById("bonusLow").value = state.bonusPay.하;
+  if(document.getElementById("dPay")) document.getElementById("dPay").value = state.dismissalSettings?.dPay || 500;
+  if(document.getElementById("substituteBonus")) document.getElementById("substituteBonus").value = state.dismissalSettings?.substituteBonus || 300;
+}
+function addStudent(){
+  const name = document.getElementById("newStudentName").value.trim(); const pw = document.getElementById("newStudentPw").value.trim();
+  if(!name || !pw){ alert("학생 이름과 초기 비밀번호를 입력하세요."); return; }
+  state.students.push({id:makeId("s"), name, password:pw, isProfileSet:false}); saveState();
+  document.getElementById("newStudentName").value=""; document.getElementById("newStudentPw").value="";
+  renderLoginStudents(); renderAdmin();
+}
+function deleteStudent(studentId){
+  const s = getStudent(studentId); if(!s) return;
+  if(!confirm(`${s.name} 학생을 삭제할까요? 배정 기록도 함께 삭제됩니다.`)) return;
+  state.students = state.students.filter(x=>x.id!==studentId); delete state.assignments[studentId];
+  if(state.gradeVote?.responses) delete state.gradeVote.responses[studentId];
+  saveState(); renderLoginStudents(); renderAdmin();
+}
+function addJob(){
+  const name = document.getElementById("newJobName").value.trim(); const grade = document.getElementById("newJobGrade").value; const capacity = Math.max(1, Number(document.getElementById("newJobCapacity").value || 1)); const desc = document.getElementById("newJobDesc").value.trim();
+  if(!name){ alert("직업 이름을 입력하세요."); return; }
+  state.jobs.push({id:makeId("j"), name, grade, capacity, desc}); saveState();
+  document.getElementById("newJobName").value=""; document.getElementById("newJobCapacity").value="1"; document.getElementById("newJobDesc").value=""; renderAdmin();
+}
+function deleteJob(jobId){
+  const job = getJob(jobId); if(!job) return;
+  const used = Object.values(state.assignments).some(a=>a.jobId===jobId);
+  if(used){ alert("이미 배정된 직업은 삭제할 수 없습니다. 먼저 배정을 바꾸세요."); return; }
+  if(!confirm(`${job.name} 직업을 삭제할까요?`)) return;
+  state.jobs = state.jobs.filter(j=>j.id!==jobId); saveState(); renderAdmin();
+}
+function assignJob(){
+  const studentId = document.getElementById("assignStudent").value; const jobId = document.getElementById("assignJob").value;
+  const currentCount = Object.entries(state.assignments).filter(([sid,a])=>sid!==studentId && a.jobId===jobId).length;
+  const job = getJob(jobId);
+  if(job && currentCount + 1 > Number(job.capacity || 1)){
+    if(!confirm(`${job.name} 직업의 정원을 초과합니다. 그래도 배정할까요?`)) return;
+  }
+  state.assignments[studentId] = {jobId, performance:"중", warnings:0, selfScore:"", selfEval:"", status:"active", substituteDuties:[]};
+  saveState(); renderAdmin();
+}
+function setPerformance(studentId, value){ if(!state.assignments[studentId]) return; state.assignments[studentId].performance = value; saveState(); renderAdmin(); }
+function addWarning(studentId){ 
+  if(!state.assignments[studentId]) return; 
+  state.assignments[studentId].warnings = Number(state.assignments[studentId].warnings || 0) + 1; 
+  saveState(); 
+  renderAdmin(); 
+  if(state.assignments[studentId].warnings >= 3 && state.assignments[studentId].status !== "dismissed"){
+    const s = getStudent(studentId);
+    if(confirm(`${s?.name || "학생"} 학생의 경고가 3회가 되었습니다. 직무 교체 처리를 진행할까요?`)){
+      openDismissalProcess(studentId);
+    }
+  }
+}
+function clearWarning(studentId){ if(!state.assignments[studentId]) return; state.assignments[studentId].warnings = 0; saveState(); renderAdmin(); }
+function saveSalarySettings(){
+  state.basePay.A = Number(document.getElementById("baseA").value || 0); state.basePay.B = Number(document.getElementById("baseB").value || 0); state.basePay.C = Number(document.getElementById("baseC").value || 0);
+  state.bonusPay.상 = Number(document.getElementById("bonusHigh").value || 0); state.bonusPay.중 = Number(document.getElementById("bonusMid").value || 0); state.bonusPay.하 = Number(document.getElementById("bonusLow").value || 0);
+  state.dismissalSettings = {
+    dPay:Number(document.getElementById("dPay")?.value || 500),
+    substituteBonus:Number(document.getElementById("substituteBonus")?.value || 300)
+  };
+  saveState(); alert("급여 설정이 저장되었습니다."); renderAdmin();
+}
+
+
+function saveJobFromTable(jobId){
+  const job = getJob(jobId);
+  if(!job) return;
+  const name = document.getElementById(`job_name_${jobId}`)?.value.trim();
+  const grade = document.getElementById(`job_grade_${jobId}`)?.value;
+  const capacity = Math.max(1, Number(document.getElementById(`job_capacity_${jobId}`)?.value || 1));
+  const desc = document.getElementById(`job_desc_${jobId}`)?.value.trim();
+  if(!name){ alert("직업 이름을 입력하세요."); return; }
+  if(!["A","B","C"].includes(grade)){ alert("직업 등급은 A, B, C 중에서 선택하세요."); return; }
+  const assignedCount = Object.values(state.assignments).filter(a=>a.jobId===jobId).length;
+  if(assignedCount > capacity){
+    const ok = confirm(`${name} 직업은 현재 ${assignedCount}명이 배정되어 있습니다. 정원을 ${capacity}명으로 줄이면 정원 초과 상태가 됩니다. 그래도 저장할까요?`);
+    if(!ok) return;
+  }
+  job.name = name;
+  job.grade = grade;
+  job.capacity = capacity;
+  job.desc = desc;
+  saveState();
+  alert("직업 정보를 저장했습니다.");
+  renderAdmin();
+}
+
+function updateJobCapacity(jobId, value){
+  const job = getJob(jobId);
+  if(!job) return;
+  job.capacity = Math.max(1, Number(value || 1));
+  saveState();
+  renderAdmin();
+}
+
+function renderBulkAssignmentTable(){
+  const el = document.getElementById("bulkAssignmentTable");
+  if(!el) return;
+  const jobOptions = (selectedJobId) => {
+    return ['<option value="">미배정</option>'].concat(
+      state.jobs.map(j=>`<option value="${j.id}" ${selectedJobId===j.id?"selected":""}>${escapeHtml(j.name)} (${j.grade}, 정원 ${Number(j.capacity || 1)}명)</option>`)
+    ).join("");
+  };
+  const rows = state.students.map(s=>{
+    const a = state.assignments[s.id];
+    return `<tr>
+      <td><strong>${escapeHtml(s.name)}</strong></td>
+      <td><select id="bulk_assign_${s.id}">${jobOptions(a?.jobId || "")}</select></td>
+      <td>${a ? perfPill(a.performance || "중") : '<span class="muted">-</span>'}</td>
+      <td>${a ? (a.warnings || 0) + "회" : "-"}</td>
+    </tr>`;
+  }).join("");
+  el.innerHTML = `<table><thead><tr><th>학생</th><th>배정 직업</th><th>현재 평가</th><th>경고</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function saveBulkAssignments(){
+  const counts = {};
+  const nextAssignments = {};
+  state.students.forEach(s=>{
+    const jobId = document.getElementById(`bulk_assign_${s.id}`).value;
+    if(jobId){
+      counts[jobId] = (counts[jobId] || 0) + 1;
+      const old = state.assignments[s.id] || {};
+      nextAssignments[s.id] = {
+        jobId,
+        performance: old.performance || "중",
+        warnings: old.warnings || 0,
+        selfScore: old.selfScore || "",
+        selfEval: old.selfEval || "",
+        status: old.status || "active",
+        substituteDuties: old.substituteDuties || []
+      };
+    }
+  });
+  const over = Object.entries(counts).filter(([jobId, count]) => count > Number(getJob(jobId)?.capacity || 1));
+  if(over.length){
+    const msg = over.map(([jobId,count]) => `${getJob(jobId)?.name}: ${count}/${getJob(jobId)?.capacity}`).join("\n");
+    if(!confirm("정원을 초과한 직업이 있습니다.\n\n" + msg + "\n\n그래도 저장할까요?")) return;
+  }
+  state.assignments = nextAssignments;
+  saveState();
+  alert("초기 배정표를 저장했습니다.");
+  renderAdmin();
+}
+
+function setCurrentMonthNumber(monthNumber){
+  setSystemMonth(monthNumber);
+}
+
+function closeCurrentMonth(){
+  const monthNumber = getCurrentMonthNumber();
+  const month = monthLabel(monthNumber);
+  const existing = (state.monthHistory || []).filter(h=>getHistoryMonthNumber(h) === monthNumber);
+  let mode = "add";
+  if(existing.length > 0){
+    const overwrite = confirm(`${month} 기록이 이미 ${existing.length}개 있습니다.\n\n확인: 기존 ${month} 기록을 지우고 새로 저장\n취소: 기존 기록은 두고 새 기록으로 추가`);
+    mode = overwrite ? "overwrite" : "add";
+  }
+  if(!confirm(`${month} 기록을 마감 저장할까요?`)) return;
+  if(mode === "overwrite"){
+    state.monthHistory = (state.monthHistory || []).filter(h=>getHistoryMonthNumber(h) !== monthNumber);
+  }
+  const records = state.students.map(s=>{
+    const a = state.assignments[s.id];
+    const job = a ? getJob(a.jobId) : null;
+    return {
+      studentId:s.id,
+      studentName:s.name,
+      jobId:a?.jobId || "",
+      jobName:job?.name || "미배정",
+      jobGrade:job?.grade || "",
+      performance:a?.performance || "",
+      warnings:a?.warnings || 0,
+      selfEvalScores:getSelfEvalResponse(monthNumber, s.id)?.scores || null,
+      selfEvalAverage:getSelfEvalAverage(getSelfEvalResponse(monthNumber, s.id)),
+      selfEvalTip:getSelfEvalResponse(monthNumber, s.id)?.tip || "",
+      selfEvalSubmittedAt:getSelfEvalResponse(monthNumber, s.id)?.submittedAt || "",
+      jobOriginalGrade:job?.grade || "",
+      payGrade:getPayGradeForStudent(s.id),
+      status:a?.status || "active",
+      basePay:getBasePayForStudent(s.id),
+      bonusPay:getBonusPayForStudent(s.id),
+      substituteBonus:getSubstituteBonusForStudent(s.id),
+      substituteDuties:a?.substituteDuties || [],
+      dismissal:a?.dismissal || null,
+      salary:calculateSalary(s.id)
+    };
+  });
+  state.monthHistory.push({
+    id:makeId("month"),
+    month,
+    monthNumber,
+    closedAt:new Date().toISOString(),
+    records
+  });
+  saveState();
+  alert(`${month} 기록을 저장했습니다. 이제 다음 달 선택 순서를 생성할 수 있습니다.`);
+  renderAdmin();
+}
+
+function generateNextMonthOrder(){
+  const source = getSelectedOrderSourceMonthRecords();
+  if(!source){
+    alert("기준 월 기록을 선택하세요. 처음 달은 수동 입력 후 월 마감을 해야 다음 달 자동화가 가능합니다.");
+    return;
+  }
+  const gradeRank = {C:0, B:1, A:2, "":3, D:4};
+  const ordered = [...source.records].sort((x,y)=>{
+    const g = (gradeRank[x.payGrade || x.jobGrade] ?? 9) - (gradeRank[y.payGrade || y.jobGrade] ?? 9);
+    if(g !== 0) return g;
+    return x.studentName.localeCompare(y.studentName, "ko");
+  }).map((r, idx)=>({
+    order:idx+1,
+    studentId:r.studentId,
+    studentName:r.studentName,
+    prevJobName:r.jobName,
+    prevGrade:r.payGrade || r.jobGrade,
+    prevPerformance:r.performance,
+    prevSalary:r.salary
+  }));
+  state.nextMonthOrder = ordered;
+  state.choiceSession = {activeIndex:0, selections:{}, finalized:false};
+  saveState();
+  alert(`${source.month} 기록을 기준으로 다음 달 직업 선택 순서를 생성했습니다. 기본 기준은 C → B → A → D이며, D등급 학생은 항상 마지막에 놓입니다. 같은 등급 안에서는 성과평가를 반영하지 않고 이름순으로 정렬합니다.`);
+  renderAdmin();
+}
+
+function shuffleWithinGradeGroups(){
+  if(!state.nextMonthOrder || state.nextMonthOrder.length === 0){
+    alert("먼저 다음 달 선택 순서를 생성하세요.");
+    return;
+  }
+  const gradeOrder = ["C","B","A","","D"];
+  const shuffled = [];
+  gradeOrder.forEach(g=>{
+    const group = state.nextMonthOrder.filter(x=>x.prevGrade===g);
+    for(let i=group.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [group[i],group[j]]=[group[j],group[i]];
+    }
+    shuffled.push(...group);
+  });
+  state.nextMonthOrder = shuffled.map((x,i)=>({...x, order:i+1}));
+  saveState();
+  alert("같은 직업등급 안에서 순서를 랜덤으로 섞었습니다. 성과평가는 반영하지 않습니다.");
+  renderAdmin();
+}
+
+function clearNextMonthOrder(){
+  if(!confirm("다음 달 선택 순서를 초기화할까요?")) return;
+  state.nextMonthOrder = [];
+  saveState();
+  renderAdmin();
+}
+
+function getLatestMonthRecords(){
+  if(!state.monthHistory || state.monthHistory.length === 0) return null;
+  return state.monthHistory[state.monthHistory.length - 1];
+}
+
+function renderMonthAdmin(){
+  renderMonthSelectGrid();
+  renderOrderSourceMonthSelect();
+
+  const orderEl = document.getElementById("nextOrderTable");
+  if(orderEl){
+    if(!state.nextMonthOrder || state.nextMonthOrder.length === 0){
+      orderEl.innerHTML = `<div class="empty">아직 생성된 선택 순서가 없습니다. 선택 순서 계산은 월 마감 기록이 필요합니다. 먼저 현재 시스템 월로 월 마감을 저장하세요.</div>`;
+    } else {
+      const rows = state.nextMonthOrder.map(x=>`<tr>
+        <td><strong>${x.order}</strong></td>
+        <td>${escapeHtml(x.studentName)}</td>
+        <td>${escapeHtml(x.prevJobName)}</td>
+        <td>${gradePill(x.prevGrade || "-")}</td>
+        <td>${formatCurrency(x.prevSalary || 0)}</td>
+      </tr>`).join("");
+      orderEl.innerHTML = `<table><thead><tr><th>순서</th><th>학생</th><th>기준 월 직업</th><th>기준 월 등급</th><th>기준 월 급여</th></tr></thead><tbody>${rows}</tbody></table>
+      <p class="muted small" style="margin-top:8px">선택 순서는 직업등급만 반영합니다. 성과평가 상/중/하는 순서에 반영하지 않습니다.</p>`;
+    }
+  }
+
+  const histEl = document.getElementById("monthHistoryTable");
+  if(histEl){
+    if(!state.monthHistory || state.monthHistory.length === 0){
+      histEl.innerHTML = `<div class="empty">아직 저장된 월별 기록이 없습니다.</div>`;
+    } else {
+      const rows = [...state.monthHistory].reverse().map(h=>{
+        const count = h.records?.length || 0;
+        const totalSalary = (h.records || []).reduce((sum,r)=>sum+Number(r.salary||0),0);
+        return `<tr>
+          <td><strong>${escapeHtml(getHistoryMonthLabel(h))}</strong></td>
+          <td>${count}명</td>
+          <td>${formatCurrency(totalSalary)}</td>
+          <td>${new Date(h.closedAt).toLocaleString("ko-KR")}</td>
+        </tr>`;
+      }).join("");
+      histEl.innerHTML = `<table><thead><tr><th>월</th><th>기록 학생</th><th>총 급여</th><th>마감 시각</th></tr></thead><tbody>${rows}</tbody></table>`;
+    }
+  }
+}
+
+function renderMonthSelectGrid(){
+  const el = document.getElementById("monthSelectGrid");
+  const box = document.getElementById("currentMonthBox");
+  const current = getCurrentMonthNumber();
+  if(el){
+    el.innerHTML = getMonthOptions().map(m=>{
+      const active = current === Number(m.num);
+      const isTest = (m.num === 0 || m.num === -1);
+      const vacation = (m.num === 1 || m.num === 2);
+      const cls = ["month-chip", isTest ? "test-month" : "", vacation ? "vacation" : "", active ? "active" : ""].filter(Boolean).join(" ");
+      return `<button type="button" class="${cls}" onclick="setSystemMonth(${m.num})">${m.label}</button>`;
+    }).join("");
+  }
+  if(box){
+    box.innerHTML = `현재 운영 월: <strong>${monthLabel(current)}</strong><br><span class="small">월 마감 저장 시 ${monthLabel(current)} 기록으로 저장됩니다. 다음 달 확정 시 ${getNextMonthLabel(current)}로 이동합니다.</span>`;
+  }
+}
+
+function renderOrderSourceMonthSelect(){
+  const select = document.getElementById("orderSourceMonthSelect");
+  if(!select) return;
+  if(!state.monthHistory || state.monthHistory.length === 0){
+    select.innerHTML = `<option value="">저장된 월 기록 없음</option>`;
+    return;
+  }
+  const currentValue = select.value;
+  select.innerHTML = state.monthHistory.map(h=>`<option value="${h.id}">${escapeHtml(getHistoryMonthLabel(h))} - ${new Date(h.closedAt).toLocaleString("ko-KR")}</option>`).join("");
+  if(currentValue && state.monthHistory.some(h=>h.id===currentValue)) select.value = currentValue;
+  else select.value = state.monthHistory[state.monthHistory.length - 1].id;
+}
+
+function getSelectedOrderSourceMonthRecords(){
+  const select = document.getElementById("orderSourceMonthSelect");
+  if(select && select.value){
+    return state.monthHistory?.find(h=>h.id===select.value) || null;
+  }
+  return getLatestMonthRecords();
+}
+
+function getChoiceSession(){
+  if(!state.choiceSession) state.choiceSession = {activeIndex:0, selections:{}, finalized:false};
+  if(!state.choiceSession.selections) state.choiceSession.selections = {};
+  return state.choiceSession;
+}
+function startChoiceSession(){
+  if(!state.nextMonthOrder || state.nextMonthOrder.length === 0){ alert("먼저 다음 달 선택 순서를 생성하세요."); return; }
+  if(state.choiceSession?.selections && Object.keys(state.choiceSession.selections).length > 0){
+    if(!confirm("기존 선택 결과가 있습니다. 선택 진행을 처음부터 다시 시작할까요?")) return;
+  }
+  state.choiceSession = {activeIndex:0, selections:{}, finalized:false};
+  saveState(); renderAdmin(); openChoiceStage();
+}
+function resetChoiceSelections(){
+  if(!confirm("직업 선택 결과를 모두 초기화할까요?")) return;
+  state.choiceSession = {activeIndex:0, selections:{}, finalized:false};
+  saveState(); renderAdmin(); renderChoiceStage();
+}
+function openChoiceStage(){
+  if(!state.nextMonthOrder || state.nextMonthOrder.length === 0){ alert("먼저 다음 달 선택 순서를 생성하세요."); return; }
+  getChoiceSession(); renderChoiceStage();
+}
+function closeChoiceStage(){ const root=document.getElementById("choiceStageRoot"); if(root) root.innerHTML=""; }
+function getCurrentChoiceStudent(){ const session=getChoiceSession(); return state.nextMonthOrder?.[session.activeIndex] || null; }
+function getJobChoiceCounts(){
+  const session=getChoiceSession(); const counts={};
+  Object.values(session.selections || {}).forEach(jobId=>{ if(jobId) counts[jobId]=(counts[jobId]||0)+1; });
+  return counts;
+}
+function chooseJobForCurrent(jobId){
+  const session=getChoiceSession(); const current=getCurrentChoiceStudent(); if(!current) return;
+  const alreadySelected=session.selections[current.studentId];
+  const job=getJob(jobId); const counts=getJobChoiceCounts();
+  const currentCount=Number(counts[jobId]||0); const capacity=Number(job?.capacity||1);
+  if(alreadySelected !== jobId && currentCount >= capacity){ alert("이미 정원이 찬 직업입니다."); return; }
+  if(!confirm(`${current.studentName} 학생이 '${job.name}' 직업을 선택할까요?`)) return;
+  session.selections[current.studentId]=jobId;
+  if(session.activeIndex < state.nextMonthOrder.length - 1) session.activeIndex += 1;
+  saveState(); renderAdmin(); renderChoiceStage();
+}
+function moveChoiceStudent(delta){
+  const session=getChoiceSession();
+  session.activeIndex=Math.max(0, Math.min(session.activeIndex + delta, state.nextMonthOrder.length - 1));
+  saveState(); renderAdmin(); renderChoiceStage();
+}
+function jumpChoiceStudent(index){
+  const session=getChoiceSession();
+  session.activeIndex=Math.max(0, Math.min(index, state.nextMonthOrder.length - 1));
+  saveState(); renderAdmin(); renderChoiceStage();
+}
+function undoCurrentChoice(){
+  const session=getChoiceSession(); const current=getCurrentChoiceStudent(); if(!current) return;
+  if(!session.selections[current.studentId]){ alert("현재 학생의 선택 기록이 없습니다."); return; }
+  if(!confirm(`${current.studentName} 학생의 선택을 취소할까요?`)) return;
+  delete session.selections[current.studentId];
+  saveState(); renderAdmin(); renderChoiceStage();
+}
+function undoLastChoice(){
+  const session=getChoiceSession();
+  const entries=state.nextMonthOrder.filter(x=>session.selections[x.studentId]);
+  const last=entries[entries.length-1];
+  if(!last){ alert("취소할 선택 기록이 없습니다."); return; }
+  if(!confirm(`마지막 선택(${last.studentName})을 취소할까요?`)) return;
+  delete session.selections[last.studentId];
+  session.activeIndex=Math.max(0, state.nextMonthOrder.findIndex(x=>x.studentId===last.studentId));
+  saveState(); renderAdmin(); renderChoiceStage();
+}
+function renderChoiceSummary(){
+  const el=document.getElementById("choiceSummaryTable"); if(!el) return;
+  if(!state.nextMonthOrder || state.nextMonthOrder.length===0){ el.innerHTML=`<div class="empty">다음 달 선택 순서를 먼저 생성하세요.</div>`; return; }
+  const session=getChoiceSession(); const selectedCount=Object.keys(session.selections||{}).length; const total=state.nextMonthOrder.length;
+  const rows=state.nextMonthOrder.map((x,idx)=>{
+    const jobId=session.selections[x.studentId]; const job=jobId?getJob(jobId):null; const active=idx===session.activeIndex;
+    return `<tr><td><strong>${x.order}</strong></td><td>${active?'<span class="pill ok">현재</span>':''}</td><td>${escapeHtml(x.studentName)}</td><td>${gradePill(x.prevGrade||"-")}</td><td>${job?`<strong>${escapeHtml(job.name)}</strong>`:'<span class="muted">미선택</span>'}</td></tr>`;
+  }).join("");
+  el.innerHTML=`<div class="successbox">선택 진행: ${selectedCount}명 / ${total}명 완료</div><table><thead><tr><th>순서</th><th>상태</th><th>학생</th><th>전월 등급</th><th>선택 직업</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+function renderChoiceStage(){
+  const root=document.getElementById("choiceStageRoot"); if(!root) return;
+  const session=getChoiceSession(); const current=getCurrentChoiceStudent(); const counts=getJobChoiceCounts();
+  const selectedCount=Object.keys(session.selections||{}).length; const total=state.nextMonthOrder?.length||0;
+  if(!current){ root.innerHTML=`<div class="stage-backdrop"><div class="stage-top"><div><div class="stage-title">직업 선택 진행</div><div class="stage-sub">선택 순서가 없습니다.</div></div><button class="stage-close" onclick="closeChoiceStage()">닫기</button></div><div class="stage-main"><div class="stage-empty">다음 달 선택 순서를 먼저 생성하세요.</div></div></div>`; return; }
+  const selectedJobId=session.selections[current.studentId]; const selectedJob=selectedJobId?getJob(selectedJobId):null;
+  const jobButtons=state.jobs.map(job=>{
+    const count=Number(counts[job.id]||0); const cap=Number(job.capacity||1); const full=count>=cap && selectedJobId!==job.id; const pct=Math.min(100, Math.round((count/cap)*100));
+    return `<button class="job-choice-btn ${full?'full':''}" ${full?'disabled':''} onclick="chooseJobForCurrent('${job.id}')"><div class="job-choice-name">${escapeHtml(job.name)}</div><div class="job-choice-info"><span>${gradePill(job.grade)}</span><span>${count}/${cap}명 ${full?'마감':'가능'}</span></div><div class="capacity-bar"><div class="capacity-fill" style="width:${pct}%"></div></div></button>`;
+  }).join("");
+  const selectedRows=state.nextMonthOrder.filter(x=>session.selections[x.studentId]).map(x=>{
+    const job=getJob(session.selections[x.studentId]);
+    return `<div class="selected-row"><div>${x.order}</div><strong>${escapeHtml(x.studentName)}</strong><div>${escapeHtml(job?.name||"")}</div></div>`;
+  }).join("") || `<div class="stage-empty" style="font-size:20px; min-height:120px;">아직 선택한 학생이 없습니다.</div>`;
+  const upcomingRows=state.nextMonthOrder.map((x,idx)=>{
+    const job=session.selections[x.studentId]?getJob(session.selections[x.studentId]):null;
+    return `<div class="upcoming-item ${idx===session.activeIndex?'active':''}" onclick="jumpChoiceStudent(${idx})"><div class="upcoming-order">${x.order}</div><div><div class="upcoming-name">${escapeHtml(x.studentName)}</div><div class="upcoming-job">전월 ${x.prevGrade||"-"}등급 · ${escapeHtml(x.prevJobName||"")}</div></div><div>${job?`<span class="stage-pill">${escapeHtml(job.name)}</span>`:'<span class="stage-pill">대기</span>'}</div></div>`;
+  }).join("");
+  root.innerHTML=`<div class="stage-backdrop">
+    <div class="stage-top"><div><div class="stage-title">다음 달 직업 선택</div><div class="stage-sub">선택 진행 ${selectedCount}/${total}명 · 직업을 고르면 자동으로 다음 학생에게 넘어갑니다.</div></div><button class="stage-close" onclick="closeChoiceStage()">닫기</button></div>
+    <div class="stage-main">
+      <div class="stage-panel">
+        <div class="current-student-box">
+          <div class="current-label">지금 선택할 학생</div>
+          <div class="current-name">${escapeHtml(current.studentName)}</div>
+          <div class="current-meta"><span class="stage-pill">선택 순서 ${current.order}번</span><span class="stage-pill grade-${String(current.prevGrade||'').toLowerCase()}">전월 ${current.prevGrade||"-"}등급</span><span class="stage-pill">${escapeHtml(current.prevJobName||"전월 직업 없음")}</span></div>
+          ${selectedJob?`<div class="successbox" style="margin-top:16px;">현재 선택: <strong>${escapeHtml(selectedJob.name)}</strong></div>`:""}
+        </div>
+        <div class="stage-controls"><button class="gray" onclick="moveChoiceStudent(-1)">← 이전 학생</button><button class="gray" onclick="moveChoiceStudent(1)">다음 학생 →</button><button class="choice-danger" onclick="undoCurrentChoice()">현재 선택 취소</button><button class="choice-danger" onclick="undoLastChoice()">마지막 선택 취소</button></div>
+        <h2>선택 완료</h2><div class="selected-list">${selectedRows}</div>
+      </div>
+      <div class="stage-panel"><h2 style="margin-top:0;">선택 가능한 직업</h2><div class="job-choice-grid">${jobButtons}</div></div>
+      <div class="stage-panel"><h2 style="margin-top:0;">전체 선택 순서</h2><div class="upcoming-list">${upcomingRows}</div></div>
+    </div>
+    <div class="stage-footer"><div>조작: 직업 클릭 → 선택 확정 → 자동 다음 순서</div><div>${selectedCount===total?"모든 학생 선택 완료":`${total-selectedCount}명 남음`}</div></div>
+  </div>`;
+}
+function confirmNextMonthAssignments(){
+  const session = getChoiceSession();
+  if(!state.nextMonthOrder || state.nextMonthOrder.length === 0){ alert("선택 순서가 없습니다."); return; }
+  const missing = state.nextMonthOrder.filter(x=>!session.selections[x.studentId]);
+  if(missing.length > 0){ alert("아직 직업을 선택하지 않은 학생이 있습니다.\n\n" + missing.map(x=>x.studentName).join(", ")); return; }
+
+  const currentMonth = getCurrentMonthNumber();
+  const nextMonth = getNextMonthNumber(currentMonth);
+  if(!confirm(`선택 결과를 ${monthLabel(nextMonth)} 직업으로 확정할까요?\n확정 후 시스템 월도 ${monthLabel(nextMonth)}로 이동합니다.`)) return;
+
+  const nextAssignments = {};
+  state.nextMonthOrder.forEach(x=>{
+    nextAssignments[x.studentId] = {
+      jobId:session.selections[x.studentId],
+      performance:"중",
+      warnings:0,
+      selfScore:"",
+      selfEval:"",
+      status:"active",
+      substituteDuties:[]
+    };
+  });
+  state.students.forEach(s=>{
+    if(!nextAssignments[s.id] && state.assignments[s.id]){
+      nextAssignments[s.id] = {
+        ...state.assignments[s.id],
+        performance:"중",
+        warnings:0,
+        selfScore:"",
+        selfEval:"",
+        status:"active",
+        substituteDuties:[],
+        dismissal:null,
+        payGradeOverride:""
+      };
+    }
+  });
+
+  state.assignments = nextAssignments;
+  state.choiceSession.finalized = true;
+  state.currentMonthNumber = nextMonth;
+  state.currentMonth = monthLabel(nextMonth);
+  saveState();
+  alert(`${monthLabel(nextMonth)} 직업 배정을 확정했습니다.`);
+  closeChoiceStage();
+  renderAdmin();
+}
+
+
+/* 직업 등급 투표 */
+function getActiveGradeVote(){ return state.gradeVote || null; }
+function createGradeVote(){
+  if(state.jobs.length === 0){ alert("직업을 먼저 등록하세요."); return; }
+  const name = document.getElementById("voteMonthName").value.trim() || new Date().toLocaleDateString("ko-KR") + " 직업 등급 투표";
+  if(state.gradeVote && !confirm("기존 투표가 있습니다. 새 투표를 만들면 기존 투표 응답과 결과가 삭제됩니다. 계속할까요?")) return;
+  state.gradeVote = {
+    id:makeId("vote"), name, status:"open", createdAt:new Date().toISOString(),
+    responses:{}, results:{},
+    teacherMessage:"이번 달 직업 등급은 친구들의 점수 평가와 교사 최종 검토를 거쳐 정했습니다. 직업 등급은 학생의 등급이 아니라 직업의 책임과 부담을 나타냅니다.",
+    published:false
+  };
+  saveState(); document.getElementById("voteMonthName").value = ""; alert("직업 등급 투표가 생성되었습니다."); renderAdmin();
+}
+function closeGradeVote(){
+  const vote = getActiveGradeVote(); if(!vote){ alert("진행 중인 투표가 없습니다."); return; }
+  vote.status = "closed"; saveState(); alert("투표를 마감했습니다."); renderAdmin();
+}
+function deleteGradeVote(){
+  if(!state.gradeVote){ alert("삭제할 투표가 없습니다."); return; }
+  if(!confirm("현재 직업 등급 투표를 삭제할까요? 학생 응답과 결과가 모두 삭제됩니다.")) return;
+  state.gradeVote = null; saveState(); renderAdmin();
+}
+function renderGradeVoteAdmin(){
+  const statusEl = document.getElementById("gradeVoteStatus");
+  const submitEl = document.getElementById("gradeVoteSubmitStatus");
+  const resultEl = document.getElementById("gradeVoteResultTable");
+  const msgEl = document.getElementById("gradeVoteTeacherMessage");
+  if(!statusEl || !submitEl || !resultEl) return;
+  const vote = getActiveGradeVote();
+  if(!vote){
+    statusEl.innerHTML = `<div class="empty">아직 생성된 직업 등급 투표가 없습니다.</div>`;
+    submitEl.innerHTML = `<div class="empty">투표를 생성하면 제출 현황이 표시됩니다.</div>`;
+    resultEl.innerHTML = `<div class="empty">투표 결과가 아직 없습니다.</div>`;
+    if(msgEl) msgEl.value = "";
+    return;
+  }
+  const responseCount = Object.keys(vote.responses || {}).length;
+  const total = state.students.length;
+  const statusText = vote.published ? "결과 공개됨" : vote.status === "open" ? "투표 진행 중" : "투표 마감";
+  statusEl.innerHTML = `<div class="stat"><div class="label">${escapeHtml(vote.name)}</div><div class="num">${statusText}</div><div class="muted small">제출 ${responseCount}명 / 전체 ${total}명</div></div>`;
+  const submitted = new Set(Object.keys(vote.responses || {}));
+  const rows = state.students.map(s=>`<tr><td><strong>${escapeHtml(s.name)}</strong></td><td>${submitted.has(s.id) ? '<span class="pill ok">제출</span>' : '<span class="pill bad">미제출</span>'}</td></tr>`).join("");
+  submitEl.innerHTML = `<table><thead><tr><th>학생</th><th>상태</th></tr></thead><tbody>${rows}</tbody></table>`;
+  if(msgEl) msgEl.value = vote.teacherMessage || "";
+  const resultRows = state.jobs.map(job=>{
+    const r = (vote.results || {})[job.id];
+    const avg = r ? Number(r.average || 0).toFixed(2) : "-";
+    const hard = r ? Number(r.hard || 0).toFixed(2) : "-";
+    const responsibility = r ? Number(r.responsibility || 0).toFixed(2) : "-";
+    const consistency = r ? Number(r.consistency || 0).toFixed(2) : "-";
+    const burden = r ? Number(r.burden || 0).toFixed(2) : "-";
+    const recommended = r ? r.recommendedGrade : "-";
+    const finalGrade = r ? r.finalGrade : job.grade;
+    return `<tr><td><strong>${escapeHtml(job.name)}</strong></td><td>${avg}</td><td>${hard}</td><td>${responsibility}</td><td>${consistency}</td><td>${burden}</td><td>${recommended === "-" ? "-" : gradePill(recommended)}</td><td><select onchange="setFinalVoteGrade('${job.id}', this.value)"><option value="A" ${finalGrade==="A"?"selected":""}>A</option><option value="B" ${finalGrade==="B"?"selected":""}>B</option><option value="C" ${finalGrade==="C"?"selected":""}>C</option></select></td></tr>`;
+  }).join("");
+  resultEl.innerHTML = `<table><thead><tr><th>직업</th><th>총평균</th><th>힘듦</th><th>책임감</th><th>꾸준함</th><th>개인부담</th><th>추천</th><th>최종</th></tr></thead><tbody>${resultRows}</tbody></table>`;
+}
+function calculateGradeVoteResults(){
+  const vote = getActiveGradeVote(); if(!vote){ alert("먼저 투표를 생성하세요."); return; }
+  const responseIds = Object.keys(vote.responses || {});
+  if(responseIds.length === 0){ alert("아직 제출된 투표가 없습니다."); return; }
+  const computed = state.jobs.map(job=>{
+    let hard=0, responsibility=0, consistency=0, burden=0, count=0;
+    responseIds.forEach(studentId=>{
+      const score = vote.responses[studentId]?.scores?.[job.id];
+      if(score){ hard+=Number(score.hard||0); responsibility+=Number(score.responsibility||0); consistency+=Number(score.consistency||0); burden+=Number(score.burden||0); count++; }
+    });
+    const h = count ? hard/count : 0, r = count ? responsibility/count : 0, c = count ? consistency/count : 0, b = count ? burden/count : 0;
+    return {jobId:job.id, hard:h, responsibility:r, consistency:c, burden:b, average:h+r+c+b};
+  }).sort((a,b)=>b.average-a.average);
+  const results = {};
+  computed.forEach((item,index)=>{
+    const recommendedGrade = index < 3 ? "A" : index < 8 ? "B" : "C";
+    const oldFinal = vote.results?.[item.jobId]?.finalGrade;
+    results[item.jobId] = {...item, recommendedGrade, finalGrade:oldFinal || recommendedGrade};
+  });
+  vote.results = results; vote.status = "closed";
+  vote.teacherMessage = document.getElementById("gradeVoteTeacherMessage").value.trim() || vote.teacherMessage || "";
+  saveState(); alert("평균점과 추천 등급을 계산했습니다."); renderAdmin();
+}
+function setFinalVoteGrade(jobId, grade){
+  const vote = getActiveGradeVote(); if(!vote) return;
+  if(!vote.results) vote.results = {};
+  if(!vote.results[jobId]){
+    const job = getJob(jobId);
+    vote.results[jobId] = {jobId, hard:0, responsibility:0, consistency:0, burden:0, average:0, recommendedGrade:job?.grade || grade, finalGrade:grade};
+  } else vote.results[jobId].finalGrade = grade;
+  saveState(); renderAdmin();
+}
+function applyFinalGradesToJobs(){
+  const vote = getActiveGradeVote();
+  if(!vote || !vote.results || Object.keys(vote.results).length === 0){ alert("먼저 평균점 계산 / 추천등급 생성을 해주세요."); return; }
+  if(!confirm("최종 등급을 현재 직업 목록에 반영할까요? 급여 계산도 이 등급을 기준으로 바뀝니다.")) return;
+  state.jobs = state.jobs.map(job=>{ const r = vote.results[job.id]; return r ? {...job, grade:r.finalGrade} : job; });
+  saveState(); alert("최종 등급을 직업 목록에 반영했습니다."); renderAdmin();
+}
+function publishGradeVoteResults(){
+  const vote = getActiveGradeVote();
+  if(!vote || !vote.results || Object.keys(vote.results).length === 0){ alert("공개할 결과가 없습니다. 먼저 평균점 계산을 해주세요."); return; }
+  vote.teacherMessage = document.getElementById("gradeVoteTeacherMessage").value.trim() || vote.teacherMessage || "";
+  vote.published = true; vote.status = "closed"; saveState(); alert("학생 화면에 결과를 공개했습니다."); renderAdmin();
+}
+
+
+/* 월급 출력 */
+function getSelectedPayrollHistory(){
+  const select = document.getElementById("payrollMonthSelect");
+  if(select && select.value){
+    return state.monthHistory?.find(h=>h.id===select.value) || null;
+  }
+  return getLatestMonthRecords();
+}
+
+function renderPayrollAdmin(){
+  const select = document.getElementById("payrollMonthSelect");
+  const area = document.getElementById("printPayrollArea");
+  if(!select || !area) return;
+  const histories = state.monthHistory || [];
+  if(histories.length === 0){
+    select.innerHTML = `<option value="">저장된 월 기록 없음</option>`;
+    area.innerHTML = `<div class="empty">월 마감 기록이 있어야 월급 출력이 가능합니다.</div>`;
+    return;
+  }
+  const currentValue = select.value;
+  select.innerHTML = histories.map(h=>`<option value="${h.id}">${escapeHtml(getHistoryMonthLabel(h))} - ${new Date(h.closedAt).toLocaleString("ko-KR")}</option>`).join("");
+  if(currentValue && histories.some(h=>h.id===currentValue)) select.value = currentValue;
+  else select.value = histories[histories.length - 1].id;
+  renderPayrollPreview();
+}
+
+function renderPayrollPreview(){
+  const area = document.getElementById("printPayrollArea");
+  if(!area) return;
+  const history = getSelectedPayrollHistory();
+  if(!history){
+    area.innerHTML = `<div class="empty">출력할 월 기록을 선택하세요.</div>`;
+    return;
+  }
+  const mode = document.getElementById("payrollPrintMode")?.value || "sheet";
+  const payDate = document.getElementById("payrollPayDate")?.value.trim() || "미입력";
+  const month = getHistoryMonthLabel(history);
+  const records = history.records || [];
+  const totalSalary = records.reduce((sum,r)=>sum+Number(r.salary||0),0);
+  const closedAt = history.closedAt ? new Date(history.closedAt).toLocaleString("ko-KR") : "-";
+
+  if(records.length === 0){
+    area.innerHTML = `<div class="empty">이 월 기록에는 학생별 급여 기록이 없습니다.</div>`;
+    return;
+  }
+
+  if(mode === "slips"){
+    const slips = records.map(r=>{
+      const isD = r.status === "dismissed" || r.payGrade === "D";
+      return `<div class="payslip">
+        <h2>${escapeHtml(month)} 월급명세서</h2>
+        <div class="payslip-row"><span>이름</span><strong>${escapeHtml(r.studentName)}</strong></div>
+        <div class="payslip-row"><span>직업</span><span>${escapeHtml(r.jobName || "미배정")}</span></div>
+        <div class="payslip-row"><span>원래 직업 등급</span><span>${escapeHtml(r.jobOriginalGrade || r.jobGrade || "-")}</span></div>
+        <div class="payslip-row"><span>실제 급여 등급</span><span>${escapeHtml(r.payGrade || "-")}${isD ? " / D처리" : ""}</span></div>
+        <div class="payslip-row"><span>자기평가 평균</span><span>${r.selfEvalAverage || "-"}</span></div>
+        <div class="payslip-row"><span>교사 성과평가</span><span>${isD ? "없음" : escapeHtml(r.performance || "-")}</span></div>
+        <div class="payslip-row"><span>기본급</span><span>${formatCurrency(r.basePay || 0)}</span></div>
+        <div class="payslip-row"><span>성과급</span><span>${formatCurrency(r.bonusPay || 0)}</span></div>
+        <div class="payslip-row"><span>대체수당</span><span>${formatCurrency(r.substituteBonus || 0)}</span></div>
+        <div class="payslip-row"><span>최종 월급</span><strong>${formatCurrency(r.salary || 0)}</strong></div>
+        <div class="payroll-note">꿀팁: ${escapeHtml(r.selfEvalTip || "-")}</div>
+        <div class="payslip-sign"><span>지급일: ${escapeHtml(payDate)}</span><span>확인: __________</span></div>
+      </div>`;
+    }).join("");
+    area.innerHTML = `
+      <div class="payroll-title">
+        <h1>${escapeHtml(month)} 개별 월급명세서</h1>
+        <div class="payroll-meta">마감: ${closedAt}<br>지급일: ${escapeHtml(payDate)}<br>총액: ${formatCurrency(totalSalary)}</div>
+      </div>
+      <div class="payslip-grid">${slips}</div>`;
+    return;
+  }
+
+  const rows = records.map((r,idx)=>{
+    const isD = r.status === "dismissed" || r.payGrade === "D";
+    return `<tr>
+      <td class="center">${idx+1}</td>
+      <td><strong>${escapeHtml(r.studentName)}</strong></td>
+      <td>${escapeHtml(r.jobName || "미배정")}</td>
+      <td class="center">${escapeHtml(r.jobOriginalGrade || r.jobGrade || "-")}</td>
+      <td class="center">${escapeHtml(r.payGrade || "-")}</td>
+      <td class="center">${isD ? "예" : "-"}</td>
+      <td class="center">${r.selfEvalAverage || "-"}</td>
+      <td>${escapeHtml(r.selfEvalTip || "-")}</td>
+      <td class="center">${isD ? "없음" : escapeHtml(r.performance || "-")}</td>
+      <td class="money">${formatCurrency(r.basePay || 0)}</td>
+      <td class="money">${formatCurrency(r.bonusPay || 0)}</td>
+      <td class="money">${formatCurrency(r.substituteBonus || 0)}</td>
+      <td class="money">${formatCurrency(r.salary || 0)}</td>
+      <td class="signature-cell"></td>
+    </tr>`;
+  }).join("");
+
+  area.innerHTML = `
+    <div class="payroll-title">
+      <h1>${escapeHtml(month)} 월급 지급확인표</h1>
+      <div class="payroll-meta">마감: ${closedAt}<br>지급일: ${escapeHtml(payDate)}<br>총 지급액: ${formatCurrency(totalSalary)}</div>
+    </div>
+    <table class="payroll-table">
+      <thead><tr><th>번호</th><th>학생</th><th>직업</th><th>원래<br>등급</th><th>실제<br>등급</th><th>D처리</th><th>자기<br>평균</th><th>꿀팁 한 줄</th><th>교사<br>평가</th><th>기본급</th><th>성과급</th><th>대체<br>수당</th><th>최종<br>월급</th><th>서명</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="payroll-note">이 표는 월 마감 시 저장된 기록을 기준으로 출력됩니다. 현재 직업 배정이 바뀌어도 이 월의 월급 기록은 흔들리지 않습니다.</div>`;
+}
+
+/* 학생 화면 */
+function renderStudent(){
+  const student = getStudent(currentUser.studentId);
+  const a = state.assignments[student.id];
+  const monthNumber = getCurrentMonthNumber();
+  document.getElementById("studentGreeting").textContent = `${student.name}`;
+  document.getElementById("studentMonthBadge").textContent = `${monthLabel(monthNumber)}`;
+  document.getElementById("studentHomeSub").textContent = "내 직업과 제출할 일을 확인해요.";
+
+  const area = document.getElementById("studentJobArea");
+  if(!a){
+    area.innerHTML = `<div class="student-empty-card">아직 배정된 직업이 없어요.<br>선생님께 문의하세요.</div>`;
+    renderStudentSelfEval();
+    renderStudentGradeVote();
+    return;
+  }
+
+  const job = getJob(a.jobId);
+  if(!job){
+    area.innerHTML = `<div class="student-empty-card">배정된 직업 정보를 찾을 수 없어요.</div>`;
+    renderStudentSelfEval();
+    renderStudentGradeVote();
+    return;
+  }
+
+  const vote = getActiveGradeVote();
+  const selfEvalSession = getSelfEvalSession(monthNumber);
+  const voteStatus = !vote ? "없음" : vote.published ? "결과 확인" : vote.status === "open" ? "참여 가능" : "마감";
+  const selfEvalStatus = selfEvalSession.isOpen ? "제출 가능" : "대기";
+  const warnings = Number(a.warnings || 0);
+
+  area.innerHTML = `
+    <div class="student-main-card">
+      <div class="student-card-head">
+        <div>
+          <div class="student-status-pill">내 직업</div>
+          <h3>${escapeHtml(job.name)}</h3>
+          <p class="student-job-desc">${escapeHtml(job.desc || "직업 설명이 아직 없습니다.")}</p>
+        </div>
+        <div>${gradePill(job.grade)}</div>
+      </div>
+
+      <div class="student-summary-grid">
+        <div class="student-summary-card">
+          <div class="label">기본급</div>
+          <div class="value">${formatCurrency(state.basePay[job.grade] || 0)}</div>
+        </div>
+        <div class="student-summary-card">
+          <div class="label">현재 성과평가</div>
+          <div class="value">${a.status === "dismissed" ? "D 처리" : (a.performance || "중")}</div>
+        </div>
+        <div class="student-summary-card">
+          <div class="label">예상 월급</div>
+          <div class="value">${calculateSalary(student.id).toLocaleString()}원</div>
+        </div>
+      </div>
+
+      <div class="student-task-meta">
+        <span class="student-task-chip">직업 등급 투표: ${voteStatus}</span>
+        <span class="student-task-chip">자기평가: ${selfEvalStatus}</span>
+        <span class="student-task-chip">경고: ${warnings}회</span>
+      </div>
+
+      ${a.status === "dismissed" ? `<div class="dismiss-box">이번 달은 직무 교체 처리되어 D등급 급여가 적용돼요.</div>` : ""}
+      ${formatSubstituteDuties(student.id) ? `<div class="sub-duty-box">추가 역할<br>${formatSubstituteDuties(student.id)}</div>` : ""}
+      ${warnings ? `<div class="notice">경고가 ${warnings}회 있어요. 맡은 일을 다시 한 번 확인해 주세요.</div>` : ""}
+    </div>`;
+  renderStudentSelfEval();
+  renderStudentGradeVote();
+}
+
+function openDismissalProcess(studentId){
+  const a = state.assignments[studentId];
+  const student = getStudent(studentId);
+  const job = a ? getJob(a.jobId) : null;
+  if(!a || !student || !job){ alert("직무 교체할 학생/직업 정보를 찾을 수 없습니다."); return; }
+  if(a.status === "dismissed"){ alert("이미 D처리된 학생입니다."); return; }
+
+  const candidates = state.students.filter(s=>s.id !== studentId && state.assignments[s.id] && state.assignments[s.id].status !== "dismissed");
+  if(candidates.length === 0){ alert("대체 담당을 맡을 학생이 없습니다."); return; }
+
+  const root = document.getElementById("dismissalModalRoot");
+  const options = candidates.map(s=>{
+    const currentJob = getJob(state.assignments[s.id].jobId);
+    return `<option value="${s.id}">${escapeHtml(s.name)} - 현재 역할: ${escapeHtml(currentJob?.name || "직업 없음")}</option>`;
+  }).join("");
+
+  root.innerHTML = `
+    <div class="dismissal-modal-backdrop">
+      <div class="dismissal-modal">
+        <h2>직무 교체 처리</h2>
+        <p class="muted">대체 담당 학생을 번호로 입력하지 않고 이름 목록에서 선택합니다. 학생이 이름을 바꿔도 내부 ID로 처리되므로 안전합니다.</p>
+        <div class="dismissal-summary">
+          해고 대상: ${escapeHtml(student.name)}<br>
+          기존 역할: ${escapeHtml(job.name)} ${gradePill(job.grade)}<br>
+          처리 결과: D등급 ${formatCurrency(state.dismissalSettings?.dPay || 500)}, 성과급 없음<br>
+          대체수당: +${formatCurrency(state.dismissalSettings?.substituteBonus || 300)}
+        </div>
+        <label for="dismissalSubstituteSelect">대체 담당 학생 선택</label>
+        <select id="dismissalSubstituteSelect">${options}</select>
+        <div style="height:14px"></div>
+        <div class="actions">
+          <button class="danger" onclick="confirmDismissalProcess('${studentId}')">직무 교체 확정</button>
+          <button class="gray" onclick="closeDismissalModal()">취소</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function closeDismissalModal(){
+  const root = document.getElementById("dismissalModalRoot");
+  if(root) root.innerHTML = "";
+}
+
+function confirmDismissalProcess(studentId){
+  const a = state.assignments[studentId];
+  const student = getStudent(studentId);
+  const job = a ? getJob(a.jobId) : null;
+  const substituteId = document.getElementById("dismissalSubstituteSelect")?.value;
+  const substitute = getStudent(substituteId);
+
+  if(!a || !student || !job || !substitute){
+    alert("직무 교체 정보를 찾을 수 없습니다.");
+    return;
+  }
+  if(a.status === "dismissed"){
+    alert("이미 D처리된 학생입니다.");
+    closeDismissalModal();
+    return;
+  }
+
+  const bonus = Number(state.dismissalSettings?.substituteBonus || 300);
+  if(!confirm(`${student.name}: D등급 ${formatCurrency(state.dismissalSettings?.dPay || 500)}, 성과급 없음\n${substitute.name}: '${job.name}' 대체 담당 +${formatCurrency(bonus)}\n\n이렇게 처리할까요?`)) return;
+
+  a.status = "dismissed";
+  a.payGradeOverride = "D";
+  a.performance = "하";
+  a.dismissal = {
+    dismissedAt:new Date().toISOString(),
+    originalJobId:job.id,
+    originalJobName:job.name,
+    originalJobGrade:job.grade,
+    substituteStudentId:substitute.id,
+    substituteStudentName:substitute.name,
+    dPay:Number(state.dismissalSettings?.dPay || 500),
+    substituteBonus:bonus
+  };
+
+  const subA = state.assignments[substitute.id];
+  if(!subA.substituteDuties) subA.substituteDuties = [];
+  subA.substituteDuties = subA.substituteDuties.filter(d=>d.fromStudentId !== studentId);
+  subA.substituteDuties.push({
+    fromStudentId:student.id,
+    fromStudentName:student.name,
+    jobId:job.id,
+    jobName:job.name,
+    jobGrade:job.grade,
+    bonus,
+    assignedAt:new Date().toISOString()
+  });
+
+  saveState();
+  closeDismissalModal();
+  alert("직무 교체 처리가 완료되었습니다.");
+  renderAdmin();
+}
+
+function cancelDismissal(studentId){
+  const a = state.assignments[studentId];
+  const student = getStudent(studentId);
+  if(!a || a.status !== "dismissed"){ alert("D처리된 학생이 아닙니다."); return; }
+  if(!confirm(`${student?.name || "학생"} 학생의 D처리를 취소할까요? 대체 담당 수당도 함께 제거됩니다.`)) return;
+  const subId = a.dismissal?.substituteStudentId;
+  if(subId && state.assignments[subId]?.substituteDuties){
+    state.assignments[subId].substituteDuties = state.assignments[subId].substituteDuties.filter(d=>d.fromStudentId !== studentId);
+  }
+  a.status = "active";
+  a.payGradeOverride = "";
+  a.dismissal = null;
+  saveState();
+  renderAdmin();
+}
+
+
+const SELF_EVAL_QUESTIONS = [
+  {key:"sincerity", title:"성실도", text:"나는 이번 달 내 직업을 꾸준히 하려고 노력했다."},
+  {key:"initiative", title:"자발성", text:"나는 선생님이나 친구가 말하기 전에 스스로 하려고 노력했다."},
+  {key:"responsibility", title:"책임감", text:"나는 맡은 일을 대충 하지 않고 끝까지 하려고 노력했다."},
+  {key:"cooperation", title:"협력·배려", text:"나는 같은 역할을 맡은 친구들과 협력하고 서로 배려하려고 노력했다."},
+  {key:"overall", title:"종합점수", text:"나는 이번 달 내 직업을 전체적으로 잘 수행했다고 생각한다."}
+];
+
+function getSelfEvalSession(monthNumber){
+  if(!state.selfEvalSessions) state.selfEvalSessions = {};
+  const normalized = normalizeMonthNumber(monthNumber ?? getCurrentMonthNumber(), getCurrentMonthNumber());
+  const key = String(normalized);
+  if(!state.selfEvalSessions[key]){
+    state.selfEvalSessions[key] = {monthNumber:normalized, isOpen:false, responses:{}};
+  }
+  if(!state.selfEvalSessions[key].responses) state.selfEvalSessions[key].responses = {};
+  return state.selfEvalSessions[key];
+}
+
+function getSelfEvalResponse(monthNumber, studentId){
+  const session = getSelfEvalSession(monthNumber);
+  return session.responses?.[studentId] || null;
+}
+
+function getSelfEvalAverage(response){
+  if(!response) return "";
+  if(response.scores){
+    const vals = SELF_EVAL_QUESTIONS.map(q=>Number(response.scores[q.key] || 0)).filter(n=>n>0);
+    return vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1) : "";
+  }
+  if(response.score) return Number(response.score).toFixed(1);
+  return "";
+}
+
+function formatSelfEvalScores(response){
+  if(!response) return "-";
+  if(response.scores){
+    return SELF_EVAL_QUESTIONS.map(q=>`${q.title} ${Number(response.scores[q.key] || 0)}점`).join("<br>");
+  }
+  if(response.score) return `점수 ${response.score}점`;
+  return "-";
+}
+
+function renderSelfEvalSessionStatus(){
+  const el = document.getElementById("selfEvalSessionStatus");
+  if(!el) return;
+  const monthNumber = getCurrentMonthNumber();
+  const session = getSelfEvalSession(monthNumber);
+  const submitted = Object.keys(session.responses || {}).length;
+  const total = state.students.length;
+  const avgs = Object.values(session.responses || {}).map(r=>Number(getSelfEvalAverage(r))).filter(n=>n>0);
+  const avg = avgs.length ? (avgs.reduce((a,b)=>a+b,0)/avgs.length).toFixed(1) : "-";
+  el.innerHTML = `
+    <div class="stat">
+      <div class="label">${monthLabel(monthNumber)} 자기평가</div>
+      <div class="num">${session.isOpen ? "진행 중" : "닫힘"}</div>
+      <div class="muted small">제출 ${submitted}/${total}명 · 평균 ${avg}점</div>
+    </div>`;
+}
+
+function openSelfEvalSession(){
+  const monthNumber = getCurrentMonthNumber();
+  const session = getSelfEvalSession(monthNumber);
+  session.isOpen = true;
+  saveState();
+  alert(`${monthLabel(monthNumber)} 자기평가를 열었습니다.`);
+  renderAdmin();
+}
+
+function closeSelfEvalSession(){
+  const monthNumber = getCurrentMonthNumber();
+  const session = getSelfEvalSession(monthNumber);
+  session.isOpen = false;
+  saveState();
+  alert(`${monthLabel(monthNumber)} 자기평가를 마감했습니다.`);
+  renderAdmin();
+}
+
+function resetSelfEvalSession(){
+  const monthNumber = getCurrentMonthNumber();
+  if(!confirm(`${monthLabel(monthNumber)} 자기평가 응답을 모두 초기화할까요?`)) return;
+  state.selfEvalSessions[String(monthNumber)] = {monthNumber, isOpen:false, responses:{}};
+  saveState();
+  renderAdmin();
+}
+
+function renderStudentSelfEval(){
+  const area = document.getElementById("studentSelfEvalArea");
+  if(!area || !currentUser || currentUser.role !== "student") return;
+  const monthNumber = getCurrentMonthNumber();
+  const session = getSelfEvalSession(monthNumber);
+  const response = session.responses?.[currentUser.studentId];
+
+  if(!session.isOpen){
+    area.innerHTML = `
+      <div class="student-task-card">
+        <h2>자기평가</h2>
+        <p class="task-sub">${monthLabel(monthNumber)} 자기평가를 기다리는 중이에요.</p>
+        <div class="student-locked">선생님이 자기평가를 열면 여기에서 점수를 제출할 수 있어요.</div>
+      </div>`;
+    return;
+  }
+
+  const questionHtml = SELF_EVAL_QUESTIONS.map((q,idx)=>{
+    const saved = response?.scores?.[q.key] || response?.score || 3;
+    const options = [5,4,3,2,1].map(n=>`<option value="${n}" ${Number(saved)===n?"selected":""}>${n}점</option>`).join("");
+    return `<div class="student-question-card">
+      <div class="self-question-title">${idx+1}. ${escapeHtml(q.title)}</div>
+      <div class="self-question-text">${escapeHtml(q.text)}</div>
+      <select id="selfEval_${q.key}">${options}</select>
+    </div>`;
+  }).join("");
+
+  area.innerHTML = `
+    <div class="student-task-card">
+      <h2>자기평가</h2>
+      <p class="task-sub">${monthLabel(monthNumber)} 내 역할을 돌아보고 점수를 선택해요.</p>
+      ${response ? `<div class="student-success">이미 제출했어요. 현재 평균 ${getSelfEvalAverage(response)}점 · 다시 제출하면 수정돼요.</div>` : ""}
+      ${questionHtml}
+      <label for="selfEvalTip">다음 친구에게 전해줄 꿀팁 한 줄</label>
+      <input class="student-tip-input" id="selfEvalTip" maxlength="80" value="${escapeHtml(response?.tip || "")}" placeholder="예: 쉬는 시간마다 한 번씩 확인하면 편해요." />
+      <div style="height:12px"></div>
+      <button class="student-cta" onclick="submitSelfEval()">자기평가 제출</button>
+    </div>`;
+}
+
+function submitSelfEval(){
+  const student = getStudent(currentUser.studentId);
+  if(!student){ alert("학생 정보를 찾을 수 없습니다."); return; }
+  const monthNumber = getCurrentMonthNumber();
+  const session = getSelfEvalSession(monthNumber);
+  if(!session.isOpen){
+    alert("현재 자기평가가 열려 있지 않습니다.");
+    return;
+  }
+  const scores = {};
+  SELF_EVAL_QUESTIONS.forEach(q=>{
+    scores[q.key] = Number(document.getElementById(`selfEval_${q.key}`).value || 3);
+  });
+  const tip = document.getElementById("selfEvalTip").value.trim();
+  session.responses[student.id] = {
+    scores,
+    tip,
+    submittedAt:new Date().toISOString()
+  };
+  saveState();
+  alert("자기평가를 제출했습니다.");
+  renderStudent();
+}
+
+function renderStudentGradeVote(){
+  const area = document.getElementById("studentGradeVoteArea");
+  if(!area || !currentUser || currentUser.role !== "student") return;
+  const vote = getActiveGradeVote();
+
+  closeVoteModal(false);
+
+  if(!vote){
+    area.innerHTML = "";
+    return;
+  }
+
+  if(vote.published){
+    const resultRows = state.jobs.map(job=>{
+      const r = vote.results?.[job.id];
+      const avg = r ? Number(r.average || 0).toFixed(2) : "-";
+      const finalGrade = r ? r.finalGrade : job.grade;
+      return `<tr><td><strong>${escapeHtml(job.name)}</strong></td><td>${avg}</td><td>${gradePill(finalGrade)}</td></tr>`;
+    }).join("");
+    area.innerHTML = `
+      <div class="student-task-card">
+        <h2>직업 등급 투표 결과</h2>
+        <div class="student-success">${escapeHtml(vote.teacherMessage || "투표 결과가 공개되었어요.")}</div>
+        <table><thead><tr><th>직업</th><th>평균점</th><th>최종 등급</th></tr></thead><tbody>${resultRows}</tbody></table>
+      </div>`;
+    return;
+  }
+
+  if(vote.status !== "open"){
+    area.innerHTML = `
+      <div class="student-task-card">
+        <h2>직업 등급 투표</h2>
+        <div class="student-locked">지금은 투표를 할 수 없어요. 결과를 기다려 주세요.</div>
+      </div>`;
+    return;
+  }
+
+  const existing = vote.responses?.[currentUser.studentId];
+  const answeredCount = countAnsweredVoteJobs();
+  area.innerHTML = `
+    <div class="student-task-card">
+      <h2>직업 등급 투표</h2>
+      <p class="task-sub">직업을 하나씩 보고 점수를 매겨요.</p>
+      <div class="student-score-guide">
+        <div>1점<br>매우 낮음</div>
+        <div>2점<br>낮음</div>
+        <div>3점<br>보통</div>
+        <div>4점<br>높음</div>
+        <div>5점<br>매우 높음</div>
+      </div>
+      <div class="student-progress-text">
+        <span>진행 상태</span>
+        <span>${answeredCount}/${state.jobs.length}</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:${Math.round((answeredCount/state.jobs.length)*100)}%"></div></div>
+      <div style="height:12px"></div>
+      ${existing ? '<div class="student-success">이미 제출했어요. 다시 들어가서 수정할 수 있어요.</div>' : ''}
+      <button class="student-cta" onclick="openVoteModal(0)">${existing ? "투표 수정하기" : "투표 시작하기"}</button>
+    </div>`;
+}
+
+function countAnsweredVoteJobs(){
+  const vote = getActiveGradeVote();
+  if(!vote || !currentUser) return 0;
+  const existing = vote.responses?.[currentUser.studentId]?.scores || {};
+  return state.jobs.filter(job => !!existing[job.id]).length;
+}
+
+function openVoteModal(index){
+  const vote = getActiveGradeVote();
+  if(!vote || vote.status !== "open") {
+    alert("현재 제출 가능한 투표가 없습니다.");
+    return;
+  }
+  currentVoteJobIndex = Math.max(0, Math.min(index, state.jobs.length - 1));
+  renderVoteModal();
+}
+
+function closeVoteModal(confirmClose=true){
+  const root = document.getElementById("voteModalRoot");
+  if(!root) return;
+  if(confirmClose && root.innerHTML.trim()){
+    // 팝업만 닫습니다. 이미 고른 점수는 화면에 유지되고, 마지막 제출 전에는 서버 저장되지 않습니다.
+  }
+  root.innerHTML = "";
+}
+
+function renderVoteModal(){
+  const root = document.getElementById("voteModalRoot");
+  const vote = getActiveGradeVote();
+  if(!root || !vote || vote.status !== "open") return;
+
+  const job = state.jobs[currentVoteJobIndex];
+  const existing = vote.responses?.[currentUser.studentId]?.scores?.[job.id];
+  const draft = getVoteDraft(job.id, existing);
+  const progressPct = Math.round(((currentVoteJobIndex + 1) / state.jobs.length) * 100);
+  const isFirst = currentVoteJobIndex === 0;
+  const isLast = currentVoteJobIndex === state.jobs.length - 1;
+
+  root.innerHTML = `
+    <div class="modal-backdrop">
+      <div class="vote-modal">
+        <div class="student-modal-top">
+          <div>
+            <div class="student-status-pill">직업 ${currentVoteJobIndex + 1} / ${state.jobs.length}</div>
+            <h2 style="margin:10px 0 4px">${escapeHtml(job.name)}</h2>
+            <div class="student-modal-sub">${escapeHtml(job.desc || "직업 설명이 아직 없습니다.")}</div>
+          </div>
+          <button class="close-x" onclick="closeVoteModal()">×</button>
+        </div>
+
+        <div class="vote-progress">
+          <span>진행률</span>
+          <div class="progress-track"><div class="progress-fill" style="width:${progressPct}%"></div></div>
+          <span>${currentVoteJobIndex + 1}/${state.jobs.length}</span>
+        </div>
+
+        <div style="margin:10px 0 14px">${gradePill(job.grade)} <span class="muted small">현재 등록 등급</span></div>
+
+        <div class="vote-score-grid">
+          ${modalScoreSelect(job.id, "hard", "힘듦", "몸이나 시간을 얼마나 써야 하나요?", draft.hard)}
+          ${modalScoreSelect(job.id, "responsibility", "책임감", "실수하면 학급에 영향이 큰가요?", draft.responsibility)}
+          ${modalScoreSelect(job.id, "consistency", "꾸준함", "매일 또는 자주 해야 하나요?", draft.consistency)}
+          ${modalScoreSelect(job.id, "burden", "개인부담", "담당 인원에 비해 개인 부담이 큰가요?", draft.burden)}
+        </div>
+
+        <div class="vote-nav">
+          <button class="gray" onclick="moveVoteJob(-1)" ${isFirst ? "disabled style='opacity:.45;cursor:not-allowed'" : ""}>← 이전</button>
+          <div class="center">${isLast ? "마지막 직업이에요" : "점수를 고른 뒤 다음으로 넘어가세요"}</div>
+          ${isLast
+            ? '<button onclick="submitGradeVoteFromModal()">전체 제출</button>'
+            : '<button onclick="moveVoteJob(1)">다음 →</button>'}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function getVoteDraft(jobId, fallback){
+  const saved = window.voteDraftScores?.[jobId];
+  if(saved) return saved;
+  if(fallback) return fallback;
+  return {hard:3, responsibility:3, consistency:3, burden:3};
+}
+
+function saveCurrentModalScores(){
+  const job = state.jobs[currentVoteJobIndex];
+  if(!job) return;
+  if(!window.voteDraftScores) {
+    const vote = getActiveGradeVote();
+    const existingAll = vote?.responses?.[currentUser.studentId]?.scores || {};
+    window.voteDraftScores = JSON.parse(JSON.stringify(existingAll));
+  }
+  window.voteDraftScores[job.id] = {
+    hard:Number(document.getElementById(`modal_score_${job.id}_hard`).value),
+    responsibility:Number(document.getElementById(`modal_score_${job.id}_responsibility`).value),
+    consistency:Number(document.getElementById(`modal_score_${job.id}_consistency`).value),
+    burden:Number(document.getElementById(`modal_score_${job.id}_burden`).value)
+  };
+}
+
+function moveVoteJob(delta){
+  saveCurrentModalScores();
+  currentVoteJobIndex = Math.max(0, Math.min(currentVoteJobIndex + delta, state.jobs.length - 1));
+  renderVoteModal();
+}
+
+function modalScoreSelect(jobId, field, label, hint, value){
+  const id = `modal_score_${jobId}_${field}`;
+  const opts = [1,2,3,4,5].map(n=>`<option value="${n}" ${Number(value)===n ? "selected" : ""}>${n}점</option>`).join("");
+  return `<div class="score-box">
+    <label for="${id}">${label}</label>
+    <div class="score-hint">${hint}</div>
+    <select id="${id}">${opts}</select>
+  </div>`;
+}
+
+function submitGradeVoteFromModal(){
+  const vote = getActiveGradeVote();
+  if(!vote || vote.status !== "open"){
+    alert("현재 제출 가능한 투표가 없습니다.");
+    return;
+  }
+
+  saveCurrentModalScores();
+
+  const scores = {};
+  state.jobs.forEach(job=>{
+    const draft = getVoteDraft(job.id, null);
+    scores[job.id] = draft || {hard:3, responsibility:3, consistency:3, burden:3};
+  });
+
+  vote.responses[currentUser.studentId] = {
+    submittedAt:new Date().toISOString(),
+    scores
+  };
+
+  window.voteDraftScores = null;
+  saveState();
+  closeVoteModal(false);
+  alert("직업 등급 평가를 제출했습니다.");
+  renderStudent();
+}
+
+function submitGradeVote(){
+  submitGradeVoteFromModal();
+}
+
+
+function openStudentSetup(required){
+  const root = document.getElementById("studentSetupRoot");
+  if(!root || !currentUser || currentUser.role !== "student") return;
+  const student = getStudent(currentUser.studentId);
+  if(!student) return;
+  root.innerHTML = `
+    <div class="setup-backdrop">
+      <div class="setup-card">
+        <h2>${required ? "처음 로그인 설정" : "내 정보 변경"}</h2>
+        <p>${required ? "이름과 새 비밀번호를 정해 주세요." : "이름과 비밀번호를 바꿀 수 있어요."}</p>
+        <div class="setup-rule">
+          이름은 한글로 입력할 수 있어요.<br>
+          비밀번호는 6자리 이상으로 정해 주세요.
+        </div>
+        <label for="setupStudentName">내 이름</label>
+        <input id="setupStudentName" value="${escapeHtml(student.name)}" placeholder="예: 김오구" />
+        <label for="setupStudentPw">새 비밀번호</label>
+        <input id="setupStudentPw" type="password" placeholder="6자리 이상" />
+        <label for="setupStudentPw2">새 비밀번호 확인</label>
+        <input id="setupStudentPw2" type="password" placeholder="한 번 더 입력" onkeydown="if(event.key==='Enter') saveStudentSetup(${required})" />
+        <div style="height:14px"></div>
+        <div class="actions">
+          <button onclick="saveStudentSetup(${required})">저장하기</button>
+          ${required ? "" : '<button class="gray" onclick="closeStudentSetup()">닫기</button>'}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function closeStudentSetup(){
+  const root = document.getElementById("studentSetupRoot");
+  if(root) root.innerHTML = "";
+}
+
+function saveStudentSetup(required){
+  const student = getStudent(currentUser.studentId);
+  if(!student) return;
+  const name = document.getElementById("setupStudentName").value.trim();
+  const pw = document.getElementById("setupStudentPw").value;
+  const pw2 = document.getElementById("setupStudentPw2").value;
+
+  if(!name){
+    alert("이름을 입력하세요.");
+    return;
+  }
+  if(pw.length < 6){
+    alert("비밀번호는 6자리 이상이어야 합니다.");
+    return;
+  }
+  if(pw !== pw2){
+    alert("비밀번호 확인이 맞지 않습니다.");
+    return;
+  }
+
+  student.name = name;
+  student.password = pw;
+  student.isProfileSet = true;
+
+  // 기존 배정/월기록/선택순서에 남아 있는 표시 이름도 가능한 범위에서 갱신
+  if(state.nextMonthOrder){
+    state.nextMonthOrder = state.nextMonthOrder.map(x => x.studentId === student.id ? {...x, studentName:name} : x);
+  }
+  if(state.monthHistory){
+    state.monthHistory = state.monthHistory.map(h => ({
+      ...h,
+      records:(h.records || []).map(r => r.studentId === student.id ? {...r, studentName:name} : r)
+    }));
+  }
+
+  saveState();
+  renderLoginStudents();
+  renderStudent();
+  closeStudentSetup();
+  alert("이름과 비밀번호를 저장했습니다.");
+}
+
+function resetStudentPassword(studentId){
+  const student = getStudent(studentId);
+  if(!student) return;
+  const fallback = "123456";
+  const newPw = prompt(`${student.name} 학생의 초기화 비밀번호를 입력하세요.\\n초기화 후 학생은 다음 로그인 때 반드시 새 비밀번호를 설정해야 합니다.`, fallback);
+  if(newPw === null) return;
+  if(!newPw.trim()){
+    alert("비밀번호를 입력하세요.");
+    return;
+  }
+  student.password = newPw.trim();
+  student.isProfileSet = false;
+  saveState();
+  renderLoginStudents();
+  renderAdmin();
+  alert(`${student.name} 학생의 비밀번호를 초기화했습니다. 다음 로그인 때 이름과 6자리 이상 비밀번호를 다시 설정해야 합니다.`);
+}
+
+
+function escapeHtml(text){
+  return String(text ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
+renderLoginStudents();
+initCloudSync();
+</script>
+  <div id="voteModalRoot"></div>
+  <div id="choiceStageRoot"></div>
+  <div id="studentSetupRoot"></div>
+  <div id="dismissalModalRoot"></div>
+</body>
+</html>
