@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>오구 직업센터 v13.2.10 - 새 학년 초기화 보강</title>
+  <title>오구 직업센터 v13.2.11 - 학급 번호 기본값 수정</title>
   <style>
     :root{
       --bg:#f3f6fb; --card:#ffffff; --text:#1f2937; --muted:#6b7280; --line:#e5e7eb;
@@ -1286,7 +1286,7 @@ const FIREBASE_CONFIG = {
 };
 const FIRESTORE_COLLECTION = "oguJobCenter";
 const FIRESTORE_DOC_ID = "class_5_9";
-const APP_VERSION = "v13.2.10";
+const APP_VERSION = "v13.2.11";
 let db = null;
 let cloudSyncReady = false;
 let cloudSaveTimer = null;
@@ -1524,6 +1524,26 @@ function createDefaultJobs(){
   ];
 }
 
+const DEFAULT_STUDENT_NUMBERS = [
+  ...Array.from({length:15}, (_,i)=>i+1),
+  ...Array.from({length:15}, (_,i)=>i+51)
+];
+
+function createDefaultStudents(){
+  return DEFAULT_STUDENT_NUMBERS.map(n=>({ id:"s"+n, name:n+"번 학생", password:"123456", isProfileSet:false }));
+}
+
+function isLegacyDefaultStudentRoster(students){
+  return Array.isArray(students)
+    && students.length === 26
+    && students.every((s,i)=>
+      s?.id === "s"+(i+1)
+      && s?.name === (i+1)+"번 학생"
+      && String(s?.password || "123456") === "123456"
+      && !s?.isProfileSet
+    );
+}
+
 function applyRequestedDefaultData(targetState){
   if(!targetState) return targetState;
 
@@ -1534,6 +1554,9 @@ function applyRequestedDefaultData(targetState){
 
   // 이미 배포된 브라우저의 학생 이름/비밀번호/프로필 설정은 절대 자동으로 되돌리지 않습니다.
   // 1번 학생 같은 기본 이름은 새로 초기화되는 데이터에서만 만들어집니다.
+  if(isLegacyDefaultStudentRoster(targetState.students)){
+    targetState.students = createDefaultStudents();
+  }
 
   const legacyNames = ["칠판 담당","불끄미","줄 담당","게시판 담당","금고 보조","준비물 담당","분리수거 담당","도서 담당","급식 안내 담당","학급 공지 담당"];
   const shouldReplaceJobs = !Array.isArray(targetState.jobs)
@@ -1547,7 +1570,7 @@ function applyRequestedDefaultData(targetState){
 }
 
 function createDefaultState(){
-  const students = Array.from({length:26}, (_,i)=>({ id:"s"+(i+1), name:(i+1)+"번 학생", password:"123456", isProfileSet:false }));
+  const students = createDefaultStudents();
   const jobs = createDefaultJobs();
   const assignments = {};
   students.slice(0,10).forEach((s,i)=>{
