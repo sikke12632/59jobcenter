@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>오구 직업센터 v13.2.11 - 학급 번호 기본값 수정</title>
+  <title>오구 직업센터 v13.3.1 - 화면 통합 정리</title>
   <style>
     :root{
       --bg:#f3f6fb; --card:#ffffff; --text:#1f2937; --muted:#6b7280; --line:#e5e7eb;
@@ -78,6 +78,31 @@
     .empty{padding:28px;text-align:center;color:var(--muted);background:#f8fafc;border:1px dashed #cbd5e1;border-radius:16px;}
     .score-guide{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:8px 0 16px;}
     .score-guide div{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:8px;text-align:center;font-size:12px;color:#475569;}
+
+    .workflow-shell{background:white;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:16px;padding:22px;}
+    .workflow-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:16px;}
+    .workflow-head h2{margin:0;font-size:26px;letter-spacing:-.6px;}
+    .workflow-head p{margin:6px 0 0;color:var(--muted);line-height:1.55;}
+    .workflow-badge{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-weight:900;padding:9px 13px;}
+    .workflow-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0;}
+    .workflow-step{border:1px solid #e5e7eb;background:#f8fafc;border-radius:14px;padding:13px;min-height:122px;}
+    .workflow-step.done{background:#ecfdf5;border-color:#bbf7d0;}
+    .workflow-step.active{background:#eff6ff;border-color:#bfdbfe;box-shadow:0 8px 18px rgba(37,99,235,.10);}
+    .workflow-step.warn{background:#fff7ed;border-color:#fed7aa;}
+    .workflow-step .step-num{font-size:12px;font-weight:900;color:#64748b;text-transform:uppercase;}
+    .workflow-step strong{display:block;margin:5px 0;font-size:17px;color:#111827;}
+    .workflow-step p{margin:0;color:#64748b;line-height:1.45;font-size:13px;}
+    .workflow-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+    .status-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0;}
+    .status-tile{background:#f8fafc;border:1px solid #e5e7eb;border-radius:14px;padding:13px;}
+    .status-tile .label{font-size:12px;color:#64748b;font-weight:900;margin-bottom:6px;}
+    .status-tile .value{font-size:22px;font-weight:1000;color:#111827;}
+    .history-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .history-panel{background:white;border:1px solid var(--line);border-radius:16px;padding:18px;}
+    .history-panel h3{margin:0 0 12px;font-size:19px;}
+    .log-list{display:grid;gap:8px;}
+    .log-item{border:1px solid #e5e7eb;background:#f8fafc;border-radius:12px;padding:10px;line-height:1.45;}
+    .log-item strong{display:block;color:#111827;}
 
 
 
@@ -586,6 +611,8 @@
       .row{flex-direction:column;align-items:stretch;}
       th,td{padding:9px 8px;}
       .score-guide{grid-template-columns:1fr;}
+      .workflow-head{flex-direction:column;}
+      .workflow-steps,.status-grid,.history-layout{grid-template-columns:1fr;}
       .vote-score-grid{grid-template-columns:1fr;}
       .vote-job-name{font-size:26px;}
       .vote-title-big{font-size:25px;}
@@ -972,19 +999,16 @@
     <main class="wrap">
       <section id="adminView">
         <div class="tabs">
-          <button class="active" onclick="showTab('systemmonth', this)">월 설정</button>
-          <button onclick="showTab('dashboard', this)">현황</button>
-          <button onclick="showTab('students', this)">학생 관리</button>
-          <button onclick="showTab('jobs', this)">직업 관리</button>
-          <button onclick="showTab('gradevote', this)">직업 등급 투표</button>
-          <button onclick="showTab('month', this)">월 운영</button>
-          <button onclick="showTab('payroll', this)">월급 출력</button>
-          <button onclick="showTab('evaluation', this)">월말 평가</button>
-          <button onclick="showTab('settings', this)">급여 설정</button>
+          <button class="active" data-tab="month" onclick="showTab('month', this)">월 운영</button>
+          <button data-tab="history" onclick="showTab('history', this)">기록·출력</button>
+          <button data-tab="students" onclick="showTab('students', this)">학생 관리</button>
+          <button data-tab="jobs" onclick="showTab('jobs', this)">직업 관리</button>
+          <button data-tab="systemmonth" onclick="showTab('systemmonth', this)">월 설정</button>
+          <button data-tab="settings" onclick="showTab('settings', this)">설정</button>
         </div>
 
 
-        <div id="tab-systemmonth" class="tab-page">
+        <div id="tab-systemmonth" class="tab-page hidden">
           <div class="card">
             <h2>월 설정</h2>
             <p class="muted small">여기서 정한 월이 시스템 전체의 기준 월입니다. 자기평가, 월말 평가, 월급 출력, 다음 달 역할 선택이 모두 이 월을 따라갑니다.</p>
@@ -1059,34 +1083,35 @@
         </div>
 
         <div id="tab-gradevote" class="tab-page hidden">
-          <div class="grid cols-2">
-            <div class="card">
-              <h2>이번 달 직업 등급 투표</h2>
-              <p class="muted small">학생들이 직업별로 힘듦, 책임감, 꾸준함, 개인부담을 1~5점으로 평가합니다.</p>
-              <label for="voteMonthName">투표 이름</label>
-              <input id="voteMonthName" placeholder="예: 6월 직업 등급 투표" />
-              <div style="height:12px"></div>
-              <div class="actions">
-                <button onclick="createGradeVote()">새 투표 생성</button>
-                <button class="secondary" onclick="closeGradeVote()">투표 마감</button>
-                <button class="danger" onclick="deleteGradeVote()">투표 삭제</button>
+          <div class="card">
+            <h2>직업평가는 월 운영 화면으로 통합되었습니다</h2>
+            <p class="muted small">평가 생성, 제출 확인, 평균점 계산, 최종 등급 반영을 모두 월 운영 화면에서 진행합니다.</p>
+            <button onclick="openAdminTab('month')">월 운영으로 이동</button>
+          </div>
+        </div>
+
+
+        <div id="tab-month" class="tab-page">
+
+          <div id="monthlyWorkflowPanel"></div>
+
+          <div style="height:16px"></div>
+
+          <details class="card" id="monthlyGradeVotePanel">
+            <summary><strong>직업평가 결과 자세히 보기</strong></summary>
+            <div style="height:12px"></div>
+            <div class="grid cols-2">
+              <div>
+                <h3>투표 상태</h3>
+                <div id="gradeVoteStatus"></div>
+              </div>
+              <div>
+                <h3>제출 현황</h3>
+                <div id="gradeVoteSubmitStatus"></div>
               </div>
             </div>
-
-            <div class="card">
-              <h2>투표 상태</h2>
-              <div id="gradeVoteStatus"></div>
-              <div class="notice">추천 등급은 평균점 높은 순서대로 A 3개, B 5개, C 2개로 자동 산출됩니다. 최종 등급은 교사가 수정할 수 있습니다.</div>
-            </div>
-          </div>
-
-          <div style="height:16px"></div>
-          <div class="card"><h2>제출 현황</h2><div id="gradeVoteSubmitStatus"></div></div>
-
-          <div style="height:16px"></div>
-          <div class="card">
-            <h2>평균점 및 최종 등급 검토</h2>
-            <div class="actions" style="margin-bottom:12px">
+            <div style="height:12px"></div>
+            <div class="actions">
               <button onclick="calculateGradeVoteResults()">평균점 계산 / 추천등급 생성</button>
               <button class="secondary" onclick="applyFinalGradesToJobs()">최종 등급을 직업에 반영</button>
               <button class="secondary" onclick="publishGradeVoteResults()">결과 공개</button>
@@ -1094,27 +1119,32 @@
             <label for="gradeVoteTeacherMessage">결과 공개 메시지</label>
             <textarea id="gradeVoteTeacherMessage" placeholder="예: 이번 달 직업 등급은 친구들의 점수 평가와 교사 최종 검토를 거쳐 정했습니다."></textarea>
             <div id="gradeVoteResultTable"></div>
-          </div>
-        </div>
-
-
-        <div id="tab-month" class="tab-page hidden">
-
-          <div class="grid cols-2"><div class="month-now-box" id="currentMonthBox">현재 운영 월: -</div>
-              <div class="notice">연도는 저장하지 않습니다. 매년 3월~12월 운영을 반복할 수 있도록 월 번호만 저장합니다.</div>
-            </div>
-            <div class="card">
-              <h2>월 마감</h2>
-              <p class="muted small">현재 배정, 직업등급, 자기평가, 교사평가, 경고, 급여를 월별 기록으로 저장합니다.</p>
-              <button onclick="closeCurrentMonth()">이번 달 마감 기록 저장</button>
-              <div class="notice">마감 후 “다음 달 선택 순서 생성”을 누르면 C → B → A 순서로 자동 정렬됩니다.</div>
-            </div>
-          </div>
+          </details>
 
           <div style="height:16px"></div>
 
-          <div class="card">
-            <h2>다음 달 직업 선택 순서</h2>
+          <details class="card" id="monthlyEvaluationPanel" open>
+            <summary><strong>성과급 입력 / 자기평가 확인</strong></summary>
+            <div style="height:12px"></div>
+            <div class="grid cols-2">
+              <div>
+                <h3>자기평가 상태</h3>
+                <div id="selfEvalSessionStatus"></div>
+              </div>
+              <div>
+                <h3>성과급 산정</h3>
+                <div class="notice">학생 자기평가 점수는 참고용입니다. 최종 성과급은 교사가 상/중/하로 수동 입력합니다.</div>
+              </div>
+            </div>
+            <div style="height:12px"></div>
+            <div id="evaluationTable"></div>
+          </details>
+
+          <div style="height:16px"></div>
+
+          <details class="card" id="nextMonthOrderPanel">
+            <summary><strong>다음 달 직업 선택 순서 자세히 보기</strong></summary>
+            <div style="height:12px"></div>
             <div class="row">
               <div>
                 <label for="orderSourceMonthSelect">선택 순서 기준 월(마감 기록)</label>
@@ -1129,12 +1159,13 @@
               <button class="danger" onclick="clearNextMonthOrder()">선택 순서 초기화</button>
             </div>
             <div id="nextOrderTable"></div>
-          </div>
+          </details>
 
           <div style="height:16px"></div>
 
-          <div class="card choice-board-card">
-            <h2>큰 화면 직업 선택 진행</h2>
+          <details class="card choice-board-card" id="choiceBoardPanel">
+            <summary><strong>큰 화면 직업 선택 진행</strong></summary>
+            <div style="height:12px"></div>
             <p class="muted small">학생들과 큰 모니터로 보면서 순서대로 직업을 선택합니다. 정원이 찬 직업은 자동으로 막힙니다.</p>
             <div class="choice-start-row">
               <button onclick="startChoiceSession()">선택 진행 시작/초기화</button>
@@ -1143,24 +1174,40 @@
               <button class="danger" onclick="resetChoiceSelections()">선택 결과 초기화</button>
             </div>
             <div id="choiceSummaryTable"></div>
-          </div>
+          </details>
 
           <div style="height:16px"></div>
 
-          <div class="card">
-            <h2>월별 기록</h2>
+          <details class="card" id="monthlyHistorySummaryPanel">
+            <summary><strong>저장된 월마감 기록 요약</strong></summary>
+            <div style="height:12px"></div>
+            <div class="actions" style="margin-bottom:12px">
+              <button class="secondary" onclick="openAdminTab('history')">기록·출력 화면 열기</button>
+            </div>
             <div id="monthHistoryTable"></div>
-          </div>
+          </details>
         </div>
 
-
-        <div id="tab-payroll" class="tab-page hidden">
+        <div id="tab-history" class="tab-page hidden">
           <div class="card">
-            <h2>월급명세서 / 지급확인표 출력</h2>
-            <p class="muted small">
-              월 마감 기록을 기준으로 출력합니다. 따라서 다음 달 직업 배정이 이미 바뀌어도 전달 월급 기록은 보존됩니다.
-              은행 담당 학생에게 지급확인표를 주고, 실물 학급화폐 지급 후 서명을 받을 수 있습니다.
-            </p>
+            <h2>월별 기록 / 월급 출력</h2>
+            <p class="muted small">월마감 때 저장된 스냅샷을 다시 엽니다. 10월이 되어도 6월에 누가 어떤 직업을 했고, 자기평가와 월급이 어땠는지 확인할 수 있습니다.</p>
+            <div class="row">
+              <div>
+                <label for="historyMonthSelect">확인할 월 기록</label>
+                <select id="historyMonthSelect" onchange="renderHistoryViewer()"></select>
+              </div>
+              <div class="fit">
+                <button class="secondary" onclick="syncPayrollToSelectedHistory()">선택 월 출력 미리보기</button>
+              </div>
+            </div>
+          </div>
+          <div style="height:16px"></div>
+          <div id="historyRecordDetail"></div>
+          <div style="height:16px"></div>
+          <div class="card">
+            <h2>선택 월 월급 출력</h2>
+            <p class="muted small">위에서 선택한 월의 저장 기록을 기준으로 출력합니다. 현재 직업 배정이 바뀌어도 지난 월 월급 기록은 보존됩니다.</p>
             <div class="row">
               <div>
                 <label for="payrollMonthSelect">출력할 월 기록</label>
@@ -1179,6 +1226,7 @@
               </div>
             </div>
             <div class="payroll-actions no-print">
+              <button onclick="syncPayrollToSelectedHistory()">선택 월로 맞추기</button>
               <button onclick="renderPayrollPreview()">미리보기 새로고침</button>
               <button class="secondary" onclick="window.print()">인쇄하기</button>
             </div>
@@ -1186,30 +1234,16 @@
           </div>
         </div>
 
+
+        <div id="tab-payroll" class="tab-page hidden">
+          <div class="empty">월급 출력은 기록·출력 화면으로 통합되었습니다.</div>
+        </div>
+
         <div id="tab-evaluation" class="tab-page hidden">
-          <div class="grid cols-2">
-            <div class="card">
-              <h2>월별 자기평가 열기</h2>
-              <p class="muted small">자기평가는 월별로 열고 닫습니다. 학생은 글을 쓰지 않고 1~5점만 제출합니다.</p>
-              <div id="selfEvalSessionStatus"></div>
-              <div class="actions" style="margin-top:12px">
-                <button onclick="openSelfEvalSession()">현재 월 자기평가 열기</button>
-                <button class="secondary" onclick="closeSelfEvalSession()">자기평가 마감</button>
-                <button class="danger" onclick="resetSelfEvalSession()">현재 월 응답 초기화</button>
-              </div>
-            </div>
-            <div class="card">
-              <h2>성과급 산정</h2>
-              <p class="muted small">학생 자기평가 점수는 참고용입니다. 최종 성과급은 교사가 상/중/하로 수동 입력합니다.</p>
-              <div class="notice">월 마감 시 현재 월 자기평가 점수와 교사 성과평가가 함께 저장됩니다.</div>
-            </div>
-          </div>
-
-          <div style="height:16px"></div>
-
           <div class="card">
-            <h2>월말 평가 / 성과급 입력</h2>
-            <div id="evaluationTable"></div>
+            <h2>성과급 입력은 월 운영 화면으로 통합되었습니다</h2>
+            <p class="muted small">자기평가 상태 확인과 성과급 상/중/하 입력을 모두 월 운영 화면에서 진행합니다.</p>
+            <button onclick="focusMonthlyEvaluationPanel()">성과급 입력으로 이동</button>
           </div>
         </div>
 
@@ -1286,7 +1320,7 @@ const FIREBASE_CONFIG = {
 };
 const FIRESTORE_COLLECTION = "oguJobCenter";
 const FIRESTORE_DOC_ID = "class_5_9";
-const APP_VERSION = "v13.2.11";
+const APP_VERSION = "v13.3.0";
 let db = null;
 let cloudSyncReady = false;
 let cloudSaveTimer = null;
@@ -1477,6 +1511,7 @@ async function writeStateToCloud(){
 
 
 function makeId(prefix){ return prefix + "_" + Math.random().toString(36).slice(2,10); }
+function cloneData(value){ return JSON.parse(JSON.stringify(value ?? null)); }
 function formatCurrency(value){ return `${Number(value || 0).toLocaleString()}${CURRENCY_UNIT}`; }
 function normalizeMonthNumber(value, fallback=5){
   const n = Number(value);
@@ -1587,7 +1622,8 @@ function createDefaultState(){
     nextMonthOrder:[],
     choiceSession:{activeIndex:0, selections:{}, finalized:false},
     selfEvalSessions:{},
-    gradeVote:null
+    gradeVote:null,
+    operationLogs:[]
   };
 }
 
@@ -1606,11 +1642,14 @@ function normalizeLoadedState(parsed){
   }
   parsed.currentMonthNumber = normalizeMonthNumber(parsed.currentMonthNumber ?? parseMonthNumber(parsed.currentMonth), 5);
   parsed.currentMonth = monthLabel(parsed.currentMonthNumber);
+  if(parsed.gradeVote && !("monthNumber" in parsed.gradeVote)) parsed.gradeVote.monthNumber = parsed.currentMonthNumber;
   if(!("monthHistory" in parsed)) parsed.monthHistory = [];
   if(!("nextMonthOrder" in parsed)) parsed.nextMonthOrder = [];
   if(!("choiceSession" in parsed)) parsed.choiceSession = {activeIndex:0, selections:{}, finalized:false};
   if(!parsed.choiceSession) parsed.choiceSession = {activeIndex:0, selections:{}, finalized:false};
   if(!("selfEvalSessions" in parsed)) parsed.selfEvalSessions = {};
+  if(!("operationLogs" in parsed)) parsed.operationLogs = [];
+  if(!Array.isArray(parsed.operationLogs)) parsed.operationLogs = [];
   if(!("dismissalSettings" in parsed)) parsed.dismissalSettings = {dPay:500, substituteBonus:300};
   if(!parsed.dismissalSettings) parsed.dismissalSettings = {dPay:500, substituteBonus:300};
   if(parsed.assignments){
@@ -1654,6 +1693,25 @@ function loadState(){
 function saveState(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   scheduleCloudSave();
+}
+
+function addOperationLog(action, monthNumber=getCurrentMonthNumber(), detail=""){
+  if(!state.operationLogs) state.operationLogs = [];
+  state.operationLogs.push({
+    id:makeId("log"),
+    action,
+    monthNumber:normalizeMonthNumber(monthNumber, getCurrentMonthNumber()),
+    detail,
+    createdAt:new Date().toISOString()
+  });
+  if(state.operationLogs.length > 300) state.operationLogs = state.operationLogs.slice(-300);
+}
+
+function getMonthLogs(monthNumber, historyId=null){
+  return (state.operationLogs || []).filter(log=>{
+    if(historyId && log.historyId === historyId) return true;
+    return normalizeMonthNumber(log.monthNumber, 5) === normalizeMonthNumber(monthNumber, 5);
+  });
 }
 
 function downloadStateBackup(){
@@ -1766,8 +1824,12 @@ function showTab(tabName, btn){
   document.querySelectorAll(".tab-page").forEach(el=>el.classList.add("hidden"));
   document.getElementById("tab-"+tabName).classList.remove("hidden");
   document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
+  if(btn) btn.classList.add("active");
   renderAdmin();
+}
+function openAdminTab(tabName){
+  const btn = document.querySelector(`.tabs button[data-tab="${tabName}"]`);
+  showTab(tabName, btn);
 }
 function getJob(jobId){ return state.jobs.find(j=>j.id===jobId); }
 function getStudent(studentId){ return state.students.find(s=>s.id===studentId); }
@@ -1856,7 +1918,6 @@ function setSystemMonth(monthNumber){
   draftSystemMonthNumber = n;
   saveState();
   renderSystemMonthPanel();
-  renderMonthSelectGrid();
   if(currentUser?.role === "teacher") renderAdmin();
   if(currentUser?.role === "student") renderStudent();
 }
@@ -1949,7 +2010,7 @@ function renderAdmin(){
   document.getElementById("statStudents").textContent = state.students.length;
   document.getElementById("statJobs").textContent = state.jobs.length;
   document.getElementById("statAssigned").textContent = Object.keys(state.assignments).length;
-  renderAssignmentTable(); renderStudentSelects(); renderBulkAssignmentTable(); renderStudentTable(); renderJobTable(); renderGradeVoteAdmin(); renderMonthAdmin(); renderSystemMonthPanel(); renderChoiceSummary(); renderPayrollAdmin(); renderSelfEvalSessionStatus(); renderEvaluationTable(); renderSettings();
+  renderAssignmentTable(); renderStudentSelects(); renderBulkAssignmentTable(); renderStudentTable(); renderJobTable(); renderGradeVoteAdmin(); renderMonthAdmin(); renderSystemMonthPanel(); renderChoiceSummary(); renderPayrollAdmin(); renderSelfEvalSessionStatus(); renderEvaluationTable(); renderSettings(); renderMonthlyWorkflow(); renderHistoryViewer();
 }
 function renderStudentSelects(){
   document.getElementById("assignStudent").innerHTML = state.students.map(s=>`<option value="${s.id}">${escapeHtml(s.name)}</option>`).join("");
@@ -2048,6 +2109,249 @@ function renderSettings(){
   if(document.getElementById("dPay")) document.getElementById("dPay").value = state.dismissalSettings?.dPay || 500;
   if(document.getElementById("substituteBonus")) document.getElementById("substituteBonus").value = state.dismissalSettings?.substituteBonus || 300;
 }
+
+function createGradeVoteObject(monthNumber, name){
+  const month = monthLabel(monthNumber);
+  return {
+    id:makeId("vote"),
+    name:name || `${month} 직업 등급 투표`,
+    monthNumber:normalizeMonthNumber(monthNumber, getCurrentMonthNumber()),
+    status:"open",
+    createdAt:new Date().toISOString(),
+    responses:{},
+    results:{},
+    teacherMessage:`${month} 직업 등급은 친구들의 점수 평가와 교사 최종 검토를 거쳐 정했습니다. 직업 등급은 학생의 등급이 아니라 직업의 책임과 부담을 나타냅니다.`,
+    published:false
+  };
+}
+
+function getVoteForMonth(monthNumber){
+  const vote = getActiveGradeVote();
+  if(!vote) return null;
+  if(vote.monthNumber === undefined || vote.monthNumber === null) return vote;
+  return normalizeMonthNumber(vote.monthNumber, getCurrentMonthNumber()) === normalizeMonthNumber(monthNumber, getCurrentMonthNumber()) ? vote : null;
+}
+
+function getMonthlyStats(monthNumber=getCurrentMonthNumber()){
+  const session = getSelfEvalSession(monthNumber);
+  const vote = getVoteForMonth(monthNumber);
+  const histories = state.monthHistory || [];
+  const historyForMonth = histories.filter(h=>getHistoryMonthNumber(h) === normalizeMonthNumber(monthNumber, 5));
+  const assignedCount = state.students.filter(s=>state.assignments[s.id]).length;
+  const selfSubmitted = Object.keys(session.responses || {}).length;
+  const voteSubmitted = Object.keys(vote?.responses || {}).length;
+  const voteResultCount = Object.keys(vote?.results || {}).length;
+  const orderCount = state.nextMonthOrder?.length || 0;
+  const selectionCount = Object.keys(state.choiceSession?.selections || {}).length;
+  return {
+    monthNumber,
+    session,
+    vote,
+    assignedCount,
+    selfSubmitted,
+    voteSubmitted,
+    voteResultCount,
+    latestHistory:historyForMonth[historyForMonth.length - 1] || null,
+    historyCount:historyForMonth.length,
+    orderCount,
+    selectionCount
+  };
+}
+
+function openMonthlyEvaluations(){
+  const monthNumber = getCurrentMonthNumber();
+  const month = monthLabel(monthNumber);
+  const session = getSelfEvalSession(monthNumber);
+  const existingVote = getActiveGradeVote();
+  const sameMonthVote = getVoteForMonth(monthNumber);
+
+  if(existingVote && !sameMonthVote){
+    const ok = confirm(`현재 다른 월의 직업평가 투표가 남아 있습니다.\n\n${month} 평가를 새로 만들면 현재 투표 화면은 ${month} 기준으로 바뀝니다. 지난 월 기록은 월마감 스냅샷에 남아 있어야 안전합니다.\n\n계속할까요?`);
+    if(!ok) return;
+  }
+
+  session.isOpen = true;
+  if(sameMonthVote){
+    sameMonthVote.status = "open";
+    sameMonthVote.monthNumber = monthNumber;
+  }else{
+    state.gradeVote = createGradeVoteObject(monthNumber);
+  }
+  addOperationLog("평가 생성", monthNumber, "자기평가와 직업 등급 투표를 함께 열었습니다.");
+  saveState();
+  alert(`${month} 자기평가와 직업평가를 열었습니다.`);
+  renderAdmin();
+}
+
+function computeGradeVoteResults(vote){
+  if(!vote) return null;
+  const responseIds = Object.keys(vote.responses || {});
+  if(responseIds.length === 0) return null;
+  const computed = state.jobs.map(job=>{
+    let hard=0, responsibility=0, consistency=0, burden=0, count=0;
+    responseIds.forEach(studentId=>{
+      const score = vote.responses[studentId]?.scores?.[job.id];
+      if(score){ hard+=Number(score.hard||0); responsibility+=Number(score.responsibility||0); consistency+=Number(score.consistency||0); burden+=Number(score.burden||0); count++; }
+    });
+    const h = count ? hard/count : 0, r = count ? responsibility/count : 0, c = count ? consistency/count : 0, b = count ? burden/count : 0;
+    return {jobId:job.id, hard:h, responsibility:r, consistency:c, burden:b, average:h+r+c+b};
+  }).sort((a,b)=>b.average-a.average);
+  const results = {};
+  computed.forEach((item,index)=>{
+    const recommendedGrade = index < 3 ? "A" : index < 8 ? "B" : "C";
+    const oldFinal = vote.results?.[item.jobId]?.finalGrade;
+    results[item.jobId] = {...item, recommendedGrade, finalGrade:oldFinal || recommendedGrade};
+  });
+  return results;
+}
+
+function closeMonthlyEvaluations(){
+  const monthNumber = getCurrentMonthNumber();
+  const month = monthLabel(monthNumber);
+  const session = getSelfEvalSession(monthNumber);
+  const vote = getVoteForMonth(monthNumber);
+  const selfSubmitted = Object.keys(session.responses || {}).length;
+  const voteSubmitted = Object.keys(vote?.responses || {}).length;
+  const total = state.students.length;
+  if((selfSubmitted < total || voteSubmitted < total) && !confirm(`아직 모든 학생이 제출하지 않았습니다.\n\n자기평가 ${selfSubmitted}/${total}명\n직업평가 ${voteSubmitted}/${total}명\n\n그래도 ${month} 평가를 마감할까요?`)) return;
+  session.isOpen = false;
+  if(vote){
+    const results = computeGradeVoteResults(vote);
+    if(results) vote.results = results;
+    vote.status = "closed";
+    vote.closedAt = new Date().toISOString();
+  }
+  addOperationLog("평가 마감", monthNumber, `자기평가 ${selfSubmitted}/${total}명, 직업평가 ${voteSubmitted}/${total}명 제출 상태로 마감했습니다.`);
+  saveState();
+  alert(`${month} 평가를 마감했습니다. 직업 등급 결과를 확인한 뒤 최종 등급을 반영하세요.`);
+  renderAdmin();
+}
+
+function finalizeMonthlyPayroll(){
+  const monthNumber = getCurrentMonthNumber();
+  const stats = getMonthlyStats(monthNumber);
+  if(!stats.vote || stats.voteResultCount === 0){
+    if(!confirm("직업평가 결과가 아직 계산되지 않았습니다. 그래도 현재 직업 등급으로 월급을 확정할까요?")) return;
+  }
+  if(stats.vote && stats.voteResultCount > 0 && !stats.vote.gradesAppliedAt){
+    if(!confirm("직업평가 결과는 계산되었지만 최종 등급이 아직 직업 목록에 반영되지 않았습니다.\n\n월급과 다음 달 선택 순서는 현재 직업 등급을 기준으로 저장됩니다. 그래도 월급을 확정할까요?")) return;
+  }
+  const savedHistory = closeCurrentMonth();
+  if(savedHistory){
+    openAdminTab("history");
+    const historySelect = document.getElementById("historyMonthSelect");
+    if(historySelect){
+      historySelect.value = savedHistory.id;
+      renderHistoryViewer();
+    }
+    const select = document.getElementById("payrollMonthSelect");
+    if(select){
+      select.value = savedHistory.id;
+      renderPayrollPreview();
+    }
+  }
+}
+
+function renderMonthlyWorkflow(){
+  const root = document.getElementById("monthlyWorkflowPanel");
+  if(!root) return;
+  const monthNumber = getCurrentMonthNumber();
+  const month = monthLabel(monthNumber);
+  const nextMonth = getNextMonthLabel(monthNumber);
+  const total = state.students.length;
+  const stats = getMonthlyStats(monthNumber);
+  const evalOpen = stats.session.isOpen || stats.vote?.status === "open";
+  const evalClosed = !stats.session.isOpen && stats.vote?.status === "closed" && stats.voteResultCount > 0;
+  const gradesApplied = Boolean(stats.vote?.gradesAppliedAt);
+  const monthClosed = Boolean(stats.latestHistory);
+  const orderReady = stats.orderCount > 0;
+  const choiceDone = stats.orderCount > 0 && stats.selectionCount >= stats.orderCount;
+
+  const stepClass = (done, active, warn=false) => done ? "done" : active ? "active" : warn ? "warn" : "";
+  root.innerHTML = `
+    <div class="workflow-shell">
+      <div class="workflow-head">
+        <div>
+          <h2>${escapeHtml(month)} 월 운영 흐름</h2>
+          <p>평가 생성부터 월급 확정, ${escapeHtml(nextMonth)} 직업 선택까지 한 화면에서 진행합니다. 지난 기록은 월마감 스냅샷으로 남습니다.</p>
+        </div>
+        <span class="workflow-badge">현재 월 ${escapeHtml(month)}</span>
+      </div>
+
+      <div class="status-grid">
+        <div class="status-tile"><div class="label">직업 배정</div><div class="value">${stats.assignedCount}/${total}</div></div>
+        <div class="status-tile"><div class="label">자기평가 제출</div><div class="value">${stats.selfSubmitted}/${total}</div></div>
+        <div class="status-tile"><div class="label">직업평가 제출</div><div class="value">${stats.voteSubmitted}/${total}</div></div>
+        <div class="status-tile"><div class="label">월마감 기록</div><div class="value">${stats.historyCount ? stats.historyCount+"개" : "없음"}</div></div>
+      </div>
+
+      <div class="workflow-steps">
+        <div class="workflow-step ${stepClass(evalOpen || evalClosed, !evalOpen && !evalClosed)}">
+          <div class="step-num">Step 1</div>
+          <strong>평가 생성</strong>
+          <p>자기평가와 직업평가를 동시에 열어 학생 제출을 받습니다.</p>
+        </div>
+        <div class="workflow-step ${stepClass(evalClosed, evalOpen, evalOpen && (stats.selfSubmitted < total || stats.voteSubmitted < total))}">
+          <div class="step-num">Step 2</div>
+          <strong>제출 확인 / 평가 마감</strong>
+          <p>제출 현황을 보고 마감하면 직업평가 평균과 추천 등급이 계산됩니다.</p>
+        </div>
+        <div class="workflow-step ${stepClass(monthClosed, evalClosed && !monthClosed)}">
+          <div class="step-num">Step 3</div>
+          <strong>성과급 입력 / 월급 확정</strong>
+          <p>상·중·하 성과평가를 입력한 뒤 월마감 스냅샷을 저장합니다.</p>
+        </div>
+        <div class="workflow-step ${stepClass(choiceDone, monthClosed && !choiceDone)}">
+          <div class="step-num">Step 4</div>
+          <strong>${escapeHtml(nextMonth)} 직업 선택</strong>
+          <p>마감 기록의 등급 순서로 다음 달 직업을 고르고 월을 넘깁니다.</p>
+        </div>
+      </div>
+
+      <div class="workflow-actions">
+        <button onclick="openMonthlyEvaluations()">${escapeHtml(month)} 평가 생성/다시 열기</button>
+        <button class="secondary" onclick="closeMonthlyEvaluations()">제출 확인 후 평가 마감</button>
+        <button class="secondary" onclick="applyFinalGradesToJobs()">최종 등급을 직업에 반영</button>
+        <button class="secondary" onclick="focusMonthlyEvaluationPanel()">성과급 입력 보기</button>
+        <button onclick="finalizeMonthlyPayroll()">월급 확정 및 기록 저장</button>
+        <button class="secondary" onclick="generateNextMonthOrderAndShow()">다음 달 선택 순서 생성</button>
+        <button class="secondary" onclick="openChoiceStageAndShow()">큰 화면 직업 선택</button>
+        <button class="secondary" onclick="confirmNextMonthAssignments()">선택 확정 / 월 이동</button>
+      </div>
+
+      ${gradesApplied ? `<div class="successbox">최종 직업 등급이 반영되었습니다. 성과급 입력 후 월급을 확정하세요.</div>` : evalClosed ? `<div class="notice">직업평가 결과를 확인하고 <strong>최종 등급을 직업에 반영</strong>해야 월급과 선택 순서가 이번 달 등급 기준으로 저장됩니다.</div>` : ""}
+      ${monthClosed ? `<div class="successbox">${escapeHtml(month)} 기록이 저장되어 있습니다. 기록 보기와 월급 출력에서 언제든 다시 열 수 있습니다.</div>` : ""}
+      ${orderReady ? `<div class="notice">다음 달 선택 순서 ${stats.orderCount}명이 준비되었습니다. 선택 진행을 시작하거나 큰 화면을 열 수 있습니다.</div>` : ""}
+    </div>`;
+}
+
+function focusMonthlyPanel(panelId){
+  openAdminTab("month");
+  const panel = document.getElementById(panelId);
+  if(panel){
+    panel.open = true;
+    if(typeof panel.scrollIntoView === "function") panel.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+}
+
+function focusMonthlyGradeVotePanel(){
+  focusMonthlyPanel("monthlyGradeVotePanel");
+}
+
+function focusMonthlyEvaluationPanel(){
+  focusMonthlyPanel("monthlyEvaluationPanel");
+}
+
+function generateNextMonthOrderAndShow(){
+  generateNextMonthOrder();
+  focusMonthlyPanel("nextMonthOrderPanel");
+}
+
+function openChoiceStageAndShow(){
+  focusMonthlyPanel("choiceBoardPanel");
+  openChoiceStage();
+}
+
 function addStudent(){
   const name = document.getElementById("newStudentName").value.trim(); const pw = document.getElementById("newStudentPw").value.trim();
   if(!name || !pw){ alert("학생 이름과 초기 비밀번호를 입력하세요."); return; }
@@ -2198,6 +2502,7 @@ function setCurrentMonthNumber(monthNumber){
 function closeCurrentMonth(){
   const monthNumber = getCurrentMonthNumber();
   const month = monthLabel(monthNumber);
+  const gradeVote = getVoteForMonth(monthNumber);
   const existing = (state.monthHistory || []).filter(h=>getHistoryMonthNumber(h) === monthNumber);
   let mode = "add";
   if(existing.length > 0){
@@ -2211,6 +2516,7 @@ function closeCurrentMonth(){
   const records = state.students.map(s=>{
     const a = state.assignments[s.id];
     const job = a ? getJob(a.jobId) : null;
+    const gradeVoteResponse = gradeVote?.responses?.[s.id] || null;
     return {
       studentId:s.id,
       studentName:s.name,
@@ -2223,6 +2529,9 @@ function closeCurrentMonth(){
       selfEvalAverage:getSelfEvalAverage(getSelfEvalResponse(monthNumber, s.id)),
       selfEvalTip:getSelfEvalResponse(monthNumber, s.id)?.tip || "",
       selfEvalSubmittedAt:getSelfEvalResponse(monthNumber, s.id)?.submittedAt || "",
+      gradeVoteSubmitted:Boolean(gradeVoteResponse),
+      gradeVoteSubmittedAt:gradeVoteResponse?.submittedAt || "",
+      gradeVoteScores:gradeVoteResponse?.scores ? cloneData(gradeVoteResponse.scores) : null,
       jobOriginalGrade:job?.grade || "",
       payGrade:getPayGradeForStudent(s.id),
       status:a?.status || "active",
@@ -2234,16 +2543,24 @@ function closeCurrentMonth(){
       salary:calculateSalary(s.id)
     };
   });
-  state.monthHistory.push({
+  const history = {
     id:makeId("month"),
     month,
     monthNumber,
     closedAt:new Date().toISOString(),
+    appVersion:APP_VERSION,
+    gradeVote:gradeVote ? cloneData(gradeVote) : null,
+    selfEvalSession:cloneData(getSelfEvalSession(monthNumber)),
     records
-  });
+  };
+  state.monthHistory.push(history);
+  addOperationLog("월급 확정 / 월마감", monthNumber, `${month} 기록 ${records.length}명을 스냅샷으로 저장했습니다.`);
+  const latestLog = state.operationLogs?.[state.operationLogs.length - 1];
+  if(latestLog) latestLog.historyId = history.id;
   saveState();
   alert(`${month} 기록을 저장했습니다. 이제 다음 달 선택 순서를 생성할 수 있습니다.`);
   renderAdmin();
+  return history;
 }
 
 function generateNextMonthOrder(){
@@ -2268,6 +2585,7 @@ function generateNextMonthOrder(){
   }));
   state.nextMonthOrder = ordered;
   state.choiceSession = {activeIndex:0, selections:{}, finalized:false};
+  addOperationLog("다음 달 선택 순서 생성", getHistoryMonthNumber(source), `${source.month} 기록을 기준으로 ${ordered.length}명의 선택 순서를 생성했습니다.`);
   saveState();
   alert(`${source.month} 기록을 기준으로 다음 달 직업 선택 순서를 생성했습니다. 기본 기준은 C → B → A → D이며, D등급 학생은 항상 마지막에 놓입니다. 같은 등급 안에서는 성과평가를 반영하지 않고 이름순으로 정렬합니다.`);
   renderAdmin();
@@ -2307,7 +2625,6 @@ function getLatestMonthRecords(){
 }
 
 function renderMonthAdmin(){
-  renderMonthSelectGrid();
   renderOrderSourceMonthSelect();
 
   const orderEl = document.getElementById("nextOrderTable");
@@ -2335,33 +2652,117 @@ function renderMonthAdmin(){
       const rows = [...state.monthHistory].reverse().map(h=>{
         const count = h.records?.length || 0;
         const totalSalary = (h.records || []).reduce((sum,r)=>sum+Number(r.salary||0),0);
+        const selfSubmitted = (h.records || []).filter(r=>r.selfEvalSubmittedAt).length;
+        const voteSubmitted = (h.records || []).filter(r=>r.gradeVoteSubmitted).length;
         return `<tr>
           <td><strong>${escapeHtml(getHistoryMonthLabel(h))}</strong></td>
           <td>${count}명</td>
+          <td>${selfSubmitted}/${count}</td>
+          <td>${voteSubmitted}/${count}</td>
           <td>${formatCurrency(totalSalary)}</td>
           <td>${new Date(h.closedAt).toLocaleString("ko-KR")}</td>
+          <td><button class="secondary" onclick="openHistoryRecord('${h.id}')">기록 보기</button></td>
         </tr>`;
       }).join("");
-      histEl.innerHTML = `<table><thead><tr><th>월</th><th>기록 학생</th><th>총 급여</th><th>마감 시각</th></tr></thead><tbody>${rows}</tbody></table>`;
+      histEl.innerHTML = `<table><thead><tr><th>월</th><th>학생</th><th>자기평가</th><th>직업평가</th><th>총 급여</th><th>마감 시각</th><th>열람</th></tr></thead><tbody>${rows}</tbody></table>`;
     }
   }
 }
 
-function renderMonthSelectGrid(){
-  const el = document.getElementById("monthSelectGrid");
-  const box = document.getElementById("currentMonthBox");
-  const current = getCurrentMonthNumber();
-  if(el){
-    el.innerHTML = getMonthOptions().map(m=>{
-      const active = current === Number(m.num);
-      const isTest = (m.num === 0 || m.num === -1);
-      const vacation = (m.num === 1 || m.num === 2);
-      const cls = ["month-chip", isTest ? "test-month" : "", vacation ? "vacation" : "", active ? "active" : ""].filter(Boolean).join(" ");
-      return `<button type="button" class="${cls}" onclick="setSystemMonth(${m.num})">${m.label}</button>`;
-    }).join("");
+function renderHistoryViewer(){
+  const select = document.getElementById("historyMonthSelect");
+  const detail = document.getElementById("historyRecordDetail");
+  if(!select || !detail) return;
+  const histories = state.monthHistory || [];
+  if(histories.length === 0){
+    select.innerHTML = `<option value="">저장된 월 기록 없음</option>`;
+    detail.innerHTML = `<div class="empty">아직 월마감 스냅샷이 없습니다. 월급 확정 및 기록 저장을 하면 이곳에서 과거 월을 열람할 수 있습니다.</div>`;
+    return;
   }
-  if(box){
-    box.innerHTML = `현재 운영 월: <strong>${monthLabel(current)}</strong><br><span class="small">월 마감 저장 시 ${monthLabel(current)} 기록으로 저장됩니다. 다음 달 확정 시 ${getNextMonthLabel(current)}로 이동합니다.</span>`;
+  const currentValue = select.value;
+  select.innerHTML = [...histories].reverse().map(h=>`<option value="${h.id}">${escapeHtml(getHistoryMonthLabel(h))} - ${new Date(h.closedAt).toLocaleString("ko-KR")}</option>`).join("");
+  if(currentValue && histories.some(h=>h.id===currentValue)) select.value = currentValue;
+  else select.value = histories[histories.length - 1].id;
+
+  const history = histories.find(h=>h.id === select.value);
+  if(!history){
+    detail.innerHTML = `<div class="empty">기록을 선택하세요.</div>`;
+    return;
+  }
+  const month = getHistoryMonthLabel(history);
+  const records = history.records || [];
+  const totalSalary = records.reduce((sum,r)=>sum+Number(r.salary||0),0);
+  const selfSubmitted = records.filter(r=>r.selfEvalSubmittedAt).length;
+  const voteSubmitted = records.filter(r=>r.gradeVoteSubmitted).length;
+  const closedAt = history.closedAt ? new Date(history.closedAt).toLocaleString("ko-KR") : "-";
+
+  const recordRows = records.map(r=>`<tr>
+    <td><strong>${escapeHtml(r.studentName)}</strong></td>
+    <td>${escapeHtml(r.jobName || "미배정")}</td>
+    <td>${gradePill(r.payGrade || r.jobGrade || "-")}</td>
+    <td>${r.selfEvalAverage || "-"}</td>
+    <td>${escapeHtml(r.selfEvalTip || "-")}</td>
+    <td>${r.gradeVoteSubmitted ? '<span class="pill ok">제출</span>' : '<span class="pill bad">미제출</span>'}</td>
+    <td>${r.status === "dismissed" ? '<span class="pill d">D</span>' : escapeHtml(r.performance || "-")}</td>
+    <td><strong>${formatCurrency(r.salary || 0)}</strong></td>
+  </tr>`).join("");
+
+  const vote = history.gradeVote || null;
+  const voteResults = vote?.results || {};
+  const voteRows = Object.keys(voteResults).length
+    ? Object.values(voteResults).map(r=>{
+        const jobName = records.find(rec=>rec.jobId === r.jobId)?.jobName || getJob(r.jobId)?.name || r.jobId || "직업";
+        return `<tr><td><strong>${escapeHtml(jobName)}</strong></td><td>${Number(r.average || 0).toFixed(2)}</td><td>${Number(r.hard || 0).toFixed(2)}</td><td>${Number(r.responsibility || 0).toFixed(2)}</td><td>${Number(r.consistency || 0).toFixed(2)}</td><td>${Number(r.burden || 0).toFixed(2)}</td><td>${gradePill(r.finalGrade || r.recommendedGrade || "-")}</td></tr>`;
+      }).join("")
+    : "";
+  const logs = getMonthLogs(getHistoryMonthNumber(history), history.id);
+  const logHtml = logs.length
+    ? `<div class="log-list">${logs.slice().reverse().map(log=>`<div class="log-item"><strong>${escapeHtml(log.action)}</strong><span class="small muted">${new Date(log.createdAt).toLocaleString("ko-KR")}</span><br>${escapeHtml(log.detail || "")}</div>`).join("")}</div>`
+    : `<div class="empty">이 월에 연결된 운영 로그가 아직 없습니다.</div>`;
+
+  detail.innerHTML = `
+    <div class="grid cols-4">
+      <div class="stat"><div class="label">기록 월</div><div class="num">${escapeHtml(month)}</div></div>
+      <div class="stat"><div class="label">기록 학생</div><div class="num">${records.length}</div></div>
+      <div class="stat"><div class="label">자기/직업평가</div><div class="num">${selfSubmitted}/${voteSubmitted}</div></div>
+      <div class="stat"><div class="label">총 월급</div><div class="num">${formatCurrency(totalSalary)}</div></div>
+    </div>
+    <div style="height:16px"></div>
+    <div class="history-layout">
+      <div class="history-panel">
+        <h3>${escapeHtml(month)} 학생별 기록</h3>
+        <p class="muted small">마감 시각: ${closedAt}</p>
+        <table><thead><tr><th>학생</th><th>직업</th><th>등급</th><th>자기평균</th><th>보고서/꿀팁</th><th>직업평가</th><th>성과</th><th>월급</th></tr></thead><tbody>${recordRows}</tbody></table>
+      </div>
+      <div class="history-panel">
+        <h3>직업평가 결과</h3>
+        ${voteRows ? `<table><thead><tr><th>직업</th><th>총평균</th><th>힘듦</th><th>책임</th><th>꾸준함</th><th>부담</th><th>최종</th></tr></thead><tbody>${voteRows}</tbody></table>` : `<div class="empty">이 기록에는 직업평가 결과가 저장되어 있지 않습니다.</div>`}
+        <div style="height:14px"></div>
+        <h3>운영 로그</h3>
+        ${logHtml}
+      </div>
+    </div>`;
+}
+
+function openHistoryRecord(historyId){
+  openAdminTab("history");
+  const select = document.getElementById("historyMonthSelect");
+  if(select) select.value = historyId;
+  renderHistoryViewer();
+}
+
+function openSelectedHistoryPayroll(){
+  syncPayrollToSelectedHistory();
+}
+
+function syncPayrollToSelectedHistory(){
+  const select = document.getElementById("historyMonthSelect");
+  const historyId = select?.value;
+  if(!historyId){ alert("먼저 월 기록을 선택하세요."); return; }
+  const payrollSelect = document.getElementById("payrollMonthSelect");
+  if(payrollSelect){
+    payrollSelect.value = historyId;
+    renderPayrollPreview();
   }
 }
 
@@ -2542,6 +2943,7 @@ function confirmNextMonthAssignments(){
   state.choiceSession.finalized = true;
   state.currentMonthNumber = nextMonth;
   state.currentMonth = monthLabel(nextMonth);
+  addOperationLog("다음 달 직업 확정", nextMonth, `${monthLabel(nextMonth)} 직업 배정을 확정하고 시스템 월을 이동했습니다.`);
   saveState();
   alert(`${monthLabel(nextMonth)} 직업 배정을 확정했습니다.`);
   closeChoiceStage();
@@ -2553,19 +2955,19 @@ function confirmNextMonthAssignments(){
 function getActiveGradeVote(){ return state.gradeVote || null; }
 function createGradeVote(){
   if(state.jobs.length === 0){ alert("직업을 먼저 등록하세요."); return; }
-  const name = document.getElementById("voteMonthName").value.trim() || new Date().toLocaleDateString("ko-KR") + " 직업 등급 투표";
+  const monthNumber = getCurrentMonthNumber();
+  const name = `${monthLabel(monthNumber)} 직업 등급 투표`;
   if(state.gradeVote && !confirm("기존 투표가 있습니다. 새 투표를 만들면 기존 투표 응답과 결과가 삭제됩니다. 계속할까요?")) return;
-  state.gradeVote = {
-    id:makeId("vote"), name, status:"open", createdAt:new Date().toISOString(),
-    responses:{}, results:{},
-    teacherMessage:"이번 달 직업 등급은 친구들의 점수 평가와 교사 최종 검토를 거쳐 정했습니다. 직업 등급은 학생의 등급이 아니라 직업의 책임과 부담을 나타냅니다.",
-    published:false
-  };
-  saveState(); document.getElementById("voteMonthName").value = ""; alert("직업 등급 투표가 생성되었습니다."); renderAdmin();
+  state.gradeVote = createGradeVoteObject(monthNumber, name);
+  addOperationLog("직업평가 투표 생성", monthNumber, `${name} 투표를 열었습니다.`);
+  saveState(); alert("직업 등급 투표가 생성되었습니다."); renderAdmin();
 }
 function closeGradeVote(){
   const vote = getActiveGradeVote(); if(!vote){ alert("진행 중인 투표가 없습니다."); return; }
-  vote.status = "closed"; saveState(); alert("투표를 마감했습니다."); renderAdmin();
+  vote.status = "closed";
+  vote.closedAt = new Date().toISOString();
+  addOperationLog("직업평가 투표 마감", vote.monthNumber ?? getCurrentMonthNumber(), `${vote.name} 투표를 마감했습니다.`);
+  saveState(); alert("투표를 마감했습니다."); renderAdmin();
 }
 function deleteGradeVote(){
   if(!state.gradeVote){ alert("삭제할 투표가 없습니다."); return; }
@@ -2611,23 +3013,10 @@ function calculateGradeVoteResults(){
   const vote = getActiveGradeVote(); if(!vote){ alert("먼저 투표를 생성하세요."); return; }
   const responseIds = Object.keys(vote.responses || {});
   if(responseIds.length === 0){ alert("아직 제출된 투표가 없습니다."); return; }
-  const computed = state.jobs.map(job=>{
-    let hard=0, responsibility=0, consistency=0, burden=0, count=0;
-    responseIds.forEach(studentId=>{
-      const score = vote.responses[studentId]?.scores?.[job.id];
-      if(score){ hard+=Number(score.hard||0); responsibility+=Number(score.responsibility||0); consistency+=Number(score.consistency||0); burden+=Number(score.burden||0); count++; }
-    });
-    const h = count ? hard/count : 0, r = count ? responsibility/count : 0, c = count ? consistency/count : 0, b = count ? burden/count : 0;
-    return {jobId:job.id, hard:h, responsibility:r, consistency:c, burden:b, average:h+r+c+b};
-  }).sort((a,b)=>b.average-a.average);
-  const results = {};
-  computed.forEach((item,index)=>{
-    const recommendedGrade = index < 3 ? "A" : index < 8 ? "B" : "C";
-    const oldFinal = vote.results?.[item.jobId]?.finalGrade;
-    results[item.jobId] = {...item, recommendedGrade, finalGrade:oldFinal || recommendedGrade};
-  });
-  vote.results = results; vote.status = "closed";
+  vote.results = computeGradeVoteResults(vote); vote.status = "closed";
+  vote.closedAt = new Date().toISOString();
   vote.teacherMessage = document.getElementById("gradeVoteTeacherMessage").value.trim() || vote.teacherMessage || "";
+  addOperationLog("직업평가 등급 산정", vote.monthNumber ?? getCurrentMonthNumber(), `${responseIds.length}명 응답으로 추천 등급을 계산했습니다.`);
   saveState(); alert("평균점과 추천 등급을 계산했습니다."); renderAdmin();
 }
 function setFinalVoteGrade(jobId, grade){
@@ -2644,6 +3033,8 @@ function applyFinalGradesToJobs(){
   if(!vote || !vote.results || Object.keys(vote.results).length === 0){ alert("먼저 평균점 계산 / 추천등급 생성을 해주세요."); return; }
   if(!confirm("최종 등급을 현재 직업 목록에 반영할까요? 급여 계산도 이 등급을 기준으로 바뀝니다.")) return;
   state.jobs = state.jobs.map(job=>{ const r = vote.results[job.id]; return r ? {...job, grade:r.finalGrade} : job; });
+  vote.gradesAppliedAt = new Date().toISOString();
+  addOperationLog("최종 등급 반영", vote.monthNumber ?? getCurrentMonthNumber(), "직업평가 최종 등급을 현재 직업 목록에 반영했습니다.");
   saveState(); alert("최종 등급을 직업 목록에 반영했습니다."); renderAdmin();
 }
 function publishGradeVoteResults(){
