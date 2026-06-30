@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>오구 직업센터 v13.3.1 - 화면 통합 정리</title>
+  <title>오구 직업센터 v13.3.2 - 로그인/평가 안정화</title>
   <style>
     :root{
       --bg:#f3f6fb; --card:#ffffff; --text:#1f2937; --muted:#6b7280; --line:#e5e7eb;
@@ -1320,7 +1320,7 @@ const FIREBASE_CONFIG = {
 };
 const FIRESTORE_COLLECTION = "oguJobCenter";
 const FIRESTORE_DOC_ID = "class_5_9";
-const APP_VERSION = "v13.3.0";
+const APP_VERSION = "v13.3.2";
 let db = null;
 let cloudSyncReady = false;
 let cloudSaveTimer = null;
@@ -1784,11 +1784,22 @@ function switchLogin(type){
   document.getElementById("studentLoginBox").classList.toggle("hidden", type!=="student");
 }
 function renderLoginStudents(){
-  document.getElementById("studentSelect").innerHTML = state.students.map(s=>`<option value="${s.id}">${escapeHtml(s.name)}</option>`).join("");
+  const select = document.getElementById("studentSelect");
+  if(!select) return;
+  const previousValue = select.value;
+  const hasPreviousValue = state.students.some(s=>s.id === previousValue);
+  const options = [
+    `<option value="">번호/이름 선택</option>`,
+    ...state.students.map(s=>`<option value="${s.id}">${escapeHtml(s.name)}</option>`)
+  ];
+  select.innerHTML = options.join("");
+  select.value = hasPreviousValue ? previousValue : "";
 }
 function loginTeacher(){
   const pw = document.getElementById("teacherPw").value.trim();
   if(pw !== state.teacherPassword){ showMessage("관리자 비밀번호가 맞지 않습니다."); return; }
+  window.voteDraftScores = null;
+  closeVoteModal(false);
   currentUser = {role:"teacher"};
   document.getElementById("loginScreen").classList.add("hidden");
   document.getElementById("appScreen").classList.remove("hidden");
@@ -1801,8 +1812,11 @@ function loginTeacher(){
 function loginStudent(){
   const studentId = document.getElementById("studentSelect").value;
   const pw = document.getElementById("studentPw").value.trim();
+  if(!studentId){ showMessage("학생 번호와 이름을 먼저 선택하세요."); return; }
   const student = state.students.find(s=>s.id===studentId);
   if(!student || student.password !== pw){ showMessage("학생 비밀번호가 맞지 않습니다."); return; }
+  window.voteDraftScores = null;
+  closeVoteModal(false);
   currentUser = {role:"student", studentId};
   document.getElementById("loginScreen").classList.add("hidden");
   document.getElementById("appScreen").classList.remove("hidden");
@@ -1815,8 +1829,13 @@ function loginStudent(){
 }
 function logout(){
   currentUser = null;
+  window.voteDraftScores = null;
+  closeVoteModal(false);
+  closeStudentSetup();
+  closeDismissalModal();
   document.getElementById("teacherPw").value = "";
   document.getElementById("studentPw").value = "";
+  renderLoginStudents();
   document.getElementById("loginScreen").classList.remove("hidden");
   document.getElementById("appScreen").classList.add("hidden");
 }
@@ -3491,14 +3510,14 @@ function renderStudentGradeVote(){
   if(!area || !currentUser || currentUser.role !== "student") return;
   const vote = getActiveGradeVote();
 
-  closeVoteModal(false);
-
   if(!vote){
+    closeVoteModal(false);
     area.innerHTML = "";
     return;
   }
 
   if(vote.published){
+    closeVoteModal(false);
     const resultRows = state.jobs.map(job=>{
       const r = vote.results?.[job.id];
       const avg = r ? Number(r.average || 0).toFixed(2) : "-";
@@ -3515,6 +3534,7 @@ function renderStudentGradeVote(){
   }
 
   if(vote.status !== "open"){
+    closeVoteModal(false);
     area.innerHTML = `
       <div class="student-task-card">
         <h2>직업 등급 투표</h2>
@@ -3568,7 +3588,7 @@ function closeVoteModal(confirmClose=true){
   const root = document.getElementById("voteModalRoot");
   if(!root) return;
   if(confirmClose && root.innerHTML.trim()){
-    // 팝업만 닫습니다. 이미 고른 점수는 화면에 유지되고, 마지막 제출 전에는 서버 저장되지 않습니다.
+    saveCurrentModalScores();
   }
   root.innerHTML = "";
 }
@@ -3634,16 +3654,21 @@ function getVoteDraft(jobId, fallback){
 function saveCurrentModalScores(){
   const job = state.jobs[currentVoteJobIndex];
   if(!job) return;
+  const hardEl = document.getElementById(`modal_score_${job.id}_hard`);
+  const responsibilityEl = document.getElementById(`modal_score_${job.id}_responsibility`);
+  const consistencyEl = document.getElementById(`modal_score_${job.id}_consistency`);
+  const burdenEl = document.getElementById(`modal_score_${job.id}_burden`);
+  if(!hardEl || !responsibilityEl || !consistencyEl || !burdenEl) return;
   if(!window.voteDraftScores) {
     const vote = getActiveGradeVote();
     const existingAll = vote?.responses?.[currentUser.studentId]?.scores || {};
     window.voteDraftScores = JSON.parse(JSON.stringify(existingAll));
   }
   window.voteDraftScores[job.id] = {
-    hard:Number(document.getElementById(`modal_score_${job.id}_hard`).value),
-    responsibility:Number(document.getElementById(`modal_score_${job.id}_responsibility`).value),
-    consistency:Number(document.getElementById(`modal_score_${job.id}_consistency`).value),
-    burden:Number(document.getElementById(`modal_score_${job.id}_burden`).value)
+    hard:Number(hardEl.value),
+    responsibility:Number(responsibilityEl.value),
+    consistency:Number(consistencyEl.value),
+    burden:Number(burdenEl.value)
   };
 }
 
@@ -3678,6 +3703,7 @@ function submitGradeVoteFromModal(){
     scores[job.id] = draft || {hard:3, responsibility:3, consistency:3, burden:3};
   });
 
+  if(!vote.responses) vote.responses = {};
   vote.responses[currentUser.studentId] = {
     submittedAt:new Date().toISOString(),
     scores
